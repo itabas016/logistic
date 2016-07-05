@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE1DFA71-A896-437D-B8A5-53EB46CC70F3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Logistic.Integration.Library</RootNamespace>
+    <AssemblyName>Logistic.Integration.Library</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Output\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Output\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Entriq.DataAccess">
+      <HintPath>..\..\Reference\Entriq.DataAccess.DLL</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.ApplicationServices.CustomFields.ServiceContracts">
+      <HintPath>..\..\Reference\PayMedia.ApplicationServices.CustomFields.ServiceContracts.dll</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.ApplicationServices.Devices.ServiceContracts">
+      <HintPath>..\..\Reference\PayMedia.ApplicationServices.Devices.ServiceContracts.DLL</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.ApplicationServices.Logistics.ServiceContracts">
+      <HintPath>..\..\Reference\PayMedia.ApplicationServices.Logistics.ServiceContracts.dll</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.ApplicationServices.ProductCatalog.ServiceContracts">
+      <HintPath>..\..\Reference\PayMedia.ApplicationServices.ProductCatalog.ServiceContracts.DLL</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.ApplicationServices.ScheduleManager.ServiceContracts">
+      <HintPath>..\..\Reference\PayMedia.ApplicationServices.ScheduleManager.ServiceContracts.DLL</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.ApplicationServices.SharedContracts">
+      <HintPath>..\..\Reference\PayMedia.ApplicationServices.SharedContracts.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Logistics\L_01\DeviceImportLogRecord.cs" />
+    <Compile Include="Logistics\L_01\DeviceImportRecord.cs" />
+    <Compile Include="Logistics\L_01\DeviceImportRecordThreadParam.cs" />
+    <Compile Include="Logistics\L_01\LocationIDModelName.cs" />
+    <Compile Include="Logistics\L_01\L_01_UploadDevicesAndPairing.cs" />
+    <Compile Include="Logistics\L_01\UpdateCustomFieldParams.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\L_01_Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Logistic.Integration.Common.csproj">
+      <Project>{ad5d5920-eb04-4d83-8eb0-bc811e3f54af}</Project>
+      <Name>Logistic.Integration.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Logistic.Integration.Core.csproj">
+      <Project>{48474933-02b3-4d24-83fe-9b5bda49a7c2}</Project>
+      <Name>Logistic.Integration.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
