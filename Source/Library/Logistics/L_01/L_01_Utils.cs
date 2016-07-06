@@ -17,7 +17,7 @@ using PayMedia.ApplicationServices.ProductCatalog.ServiceContracts.DataContracts
 using PayMedia.ApplicationServices.SharedContracts;
 using LookupLists = PayMedia.ApplicationServices.Devices.ServiceContracts.LookupLists;
 
-namespace Logistic.Integration.Library.Utilities
+namespace Logistic.Integration.Library
 {
     public class L_01_Utils
     {

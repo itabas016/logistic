@@ -68,7 +68,7 @@
     <Compile Include="Logistics\L_01\L_01_UploadDevicesAndPairing.cs" />
     <Compile Include="Logistics\L_01\UpdateCustomFieldParams.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\L_01_Utils.cs" />
+    <Compile Include="Logistics\L_01\L_01_Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Logistic.Integration.Common.csproj">

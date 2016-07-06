@@ -11,7 +11,6 @@ using System.Xml.Serialization;
 using Entriq.DataAccess;
 using Logistic.Integration.Common;
 using Logistic.Integration.Core;
-using Logistic.Integration.Library.Utilities;
 using PayMedia.ApplicationServices.Devices.ServiceContracts;
 using PayMedia.ApplicationServices.Devices.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts;
@@ -96,18 +95,191 @@ namespace Logistic.Integration.Library.Logistics
         protected override void Execute()
         {
             //Get the message info
+            //m_MessageInfo = (m_MessageInfo != null) ? m_MessageInfo : SerializationUtilities<FtpMessageInfo>.Soap.Deserialize(MessageContext.MailMessage.XmlDoc);
 
             //Get configuration
+            //GetConfigValues();
 
             //initialize all collections
+            InitializeLocalCollections();
 
-            //process ftp file
+            // Process the file.
+            string InputFilePath = m_MessageInfo.FilePath;
 
-            //parse validate
+            // Archive the file and rename the extension
+            string originalFileName = Path.GetFileName(InputFilePath);
+            string ftpFileName = SetFileExtension(originalFileName, ".process", true, true);
+            string archivePath = XmlUtilities.SafeSelect(WorkerSettings, "ArchivePath").InnerText;
+            archivePath = Path.Combine(archivePath, originalFileName);
+            errorFileName = InputFilePath;
+            errorFileName = SetFileExtension(errorFileName, ".error", true, true);
 
-            //archive
+            if (File.Exists(errorFileName))
+            {
+                File.Delete(errorFileName);
+            }
 
-            //core behavior
+            try
+            {
+                File.Copy(InputFilePath, archivePath, true);
+            }
+            catch (Exception copyException)
+            {
+                try
+                {
+                    FtpRenameFile(ftpFileName, ".fail");
+                }
+                catch (Exception ex)
+                {
+                    throw new IntegrationException(ex.Message, ex);
+                }
+                throw new IntegrationException(copyException.Message, copyException);
+            }
+
+            char[] delimiterChars = XmlUtilities.SafeSelect(WorkerSettings, "StringDelimiter").InnerText.ToCharArray();
+
+            int expectedRecords = 0;
+            int expectedPairs = 0;
+
+            //validate the file
+            try
+            {
+                errorRecord = string.Empty;
+
+                // *** Detect byte order mark; check if UTF-8 if used
+                byte[] buffer = new byte[5];
+                FileStream file = new FileStream(InputFilePath, FileMode.Open);
+                file.Read(buffer, 0, 5);
+                file.Close();
+                if (buffer[0] != 0xef || buffer[1] != 0xbb || buffer[2] != 0xbf)
+                {
+                    throw new Exception("Input file MUST be created using UTF-8 encoding");
+                }
+
+                // Create an instance of StreamReader to read from a file.
+                // The using statement also closes the StreamReader.                    
+                using (StreamReader sr = new StreamReader(InputFilePath, Encoding.UTF8))
+                {
+                    string line;
+                    line = sr.ReadLine();
+                    string[] lineRecord = line.Split(delimiterChars);
+
+                    if (lineRecord.Length == 2)
+                    {
+                        //get the numbers of records and pairs
+                        if (int.TryParse(lineRecord[0], out expectedRecords) == false)
+                        {
+                            string error = string.Format("Error: The Header Record value for Expected Number of Records is NOT an integer value.  The value read was '{0}'.  Please correct your data file.\r\n", lineRecord[0]);
+                            throw new IntegrationException(error);
+                        }
+
+                        if (int.TryParse(lineRecord[1], out expectedPairs) == false)
+                        {
+                            string error = string.Format("Error: The Header Record value for Expected Number of Pairings is NOT an integer value.  The value read was '{0}'.  Please correct your data file.\r\n", lineRecord[1]);
+                            throw new IntegrationException(error);
+                        }
+                    }
+                    else
+                    {
+                        string error = string.Format("Error: The Header Record is Should contain Exactly two fields. The Header Record found was '{0}'.  Please correct your data file.\r\n", line);
+                        throw new IntegrationException(error);
+                    }
+
+                    // Read and validate the records.
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        numberOfRecords++;
+                        ValidateFileStructure(line, delimiterChars, numberOfRecords);
+                    }
+
+                    if (expectedRecords != numberOfRecords)
+                    {
+                        errorRecord = string.Format("EC_2 Headerfield NumberOfRecords does not match the number of records in the file. Expected: {0} actual: {1}. ",
+                            expectedRecords, numberOfRecords);
+                        throw new Exception(errorRecord);
+                    }
+
+                    if (expectedPairs != numberOfPairs)
+                    {
+                        errorRecord = string.Format("EC_3 Headerfield NumberOfPairs{0} does not match the number of pairing records in the file {1}. ",
+                            expectedPairs, numberOfPairs);
+                        throw new Exception(errorRecord);
+                    }
+                }
+
+                CreateDeviceImportLogRecord(InputFilePath, archivePath);
+            }
+            catch (Exception validationException)
+            {
+                // Let the user know what went wrong.
+                if (errorRecord == string.Empty)
+                {
+                    errorRecord = "EC_16a An unexpected error occurred. " + validationException.Message;
+                }
+                else
+                {
+                    errorRecord = validationException.Message;
+                }
+                try
+                {
+                    WriteToFile(errorFileName, errorRecord);
+                    // rename the original file to fail
+                    FtpRenameFile(ftpFileName, ".fail");
+                    // load the error file
+                    FtpLoadFile(errorFileName);
+                }
+                catch (Exception ex)
+                {
+                    throw new IntegrationException(errorRecord, ex);
+                }
+                throw new IntegrationException(errorRecord, validationException);
+            }
+
+            //process the file
+            try
+            {
+                ProcessFile();
+                if (failedRecords > 0)
+                {
+                    // rename the original file to fail
+                    FtpRenameFile(ftpFileName, ".partial");
+                    // load the error file
+                    FtpLoadFile(errorFileName);
+                }
+                else
+                {
+                    // rename the original file to fail
+                    FtpRenameFile(ftpFileName, ".success");
+                }
+                UpdateDeviceImportLogRecord(succeededRecords, failedRecords);
+            }
+            catch (Exception processException)
+            {
+                // Let the user know what went wrong.
+                if (errorRecord == string.Empty)
+                {
+                    errorRecord = "EC_16b An unexpected error occurred. " + processException.Message;
+                }
+                else
+                {
+                    errorRecord = processException.Message;
+                }
+
+                try
+                {
+                    WriteToFile(errorFileName, errorRecord);
+                    // rename the original file to fail
+                    FtpRenameFile(ftpFileName, ".fail");
+                    // load the error file
+                    FtpLoadFile(errorFileName);
+                }
+                catch (Exception ex)
+                {
+                    //TODO: if this exception is raised we probably want to write some error using IcLogger stating the failure of the above file / FTP failure before re-throwing our exception. - JCopus
+                    throw new IntegrationException(errorRecord, ex);
+                }
+                throw new IntegrationException(errorRecord, processException);
+            }
         }
 
         protected void LoadDictionaries()
