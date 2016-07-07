@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 using Logistic.Integration.Common;
 using PayMedia.ApplicationServices.Devices.ServiceContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts;
+using PayMedia.Integration.FrameworkService.Interfaces.Common;
 
 namespace Logistic.Integration.Core
 {
@@ -47,7 +48,12 @@ namespace Logistic.Integration.Core
 
         #endregion
 
-        #region Public Methods
+        public virtual void Execute(IMsgContext msgContext)
+        {
+
+        }
+
+        #region protected Methods
 
         protected virtual IDevicesService GetIBSDevicesService()
         {
@@ -65,11 +71,6 @@ namespace Logistic.Integration.Core
         {
             IScheduleManagerService service = ServiceUtilities.GetService<IScheduleManagerService>(baseMailMessage.Dsn);
             return service;
-        }
-
-        protected virtual void Execute()
-        {
-
         }
 
         protected FtpClient GetFtpClient()

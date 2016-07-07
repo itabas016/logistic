@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<settings>
+  <group name="wodFTP.NET">
+    <KeyName>ConnectTimeOutSeconds</KeyName>
+    <Value>60</Value>
+  </group>
+  <group name="wodFTP.NET">
+    <KeyName>OperationTimeOutSeconds</KeyName>
+    <Value>60</Value>
+  </group>
+  <group name="wodFTP.NET">
+    <KeyName>ConnectRetryCount</KeyName>
+    <Value>30</Value>
+  </group>
+  <group name="wodFTP.NET">
+    <KeyName>UploadTimeoutSeconds</KeyName>
+    <Value>360</Value>
+  </group>
+</settings> 

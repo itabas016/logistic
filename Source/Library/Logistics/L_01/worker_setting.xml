@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<settings>
+  <MessageName>L_01_UploadDevicesAndPairing</MessageName>
+  <ArchivePath>C:\IBS Interprit\Integration\Archive\L_01</ArchivePath>
+  <StringDelimiter>|</StringDelimiter>
+  <DeviceTypePaired>PAIRED</DeviceTypePaired>
+  <ManufacturerStockHandlerID>10</ManufacturerStockHandlerID>
+  <BuildListImportPath>\\ibsism1\L_01_Import\</BuildListImportPath>
+  <DefaultSmartCardModelName>SCV24</DefaultSmartCardModelName>
+  <LocationIDCustomField>ExternalStockHandlerID</LocationIDCustomField>
+  <ftpUrl>ftp://192.168.193.179/SAP/Logistics/L_01/</ftpUrl>
+  <UserName>anonymous</UserName>
+  <Pass>anonymous</Pass>
+  <ScheduleAddTimeout>30</ScheduleAddTimeout>
+  <SchedulePerformTimeout>30</SchedulePerformTimeout>
+</settings>

@@ -16,6 +16,7 @@ using PayMedia.ApplicationServices.Devices.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.SharedContracts;
+using PayMedia.Integration.FrameworkService.Interfaces.Common;
 using LookupLists = PayMedia.ApplicationServices.Devices.ServiceContracts.LookupLists;
 
 namespace Logistic.Integration.Library.Logistics
@@ -92,13 +93,14 @@ namespace Logistic.Integration.Library.Logistics
         #endregion
 
         #region Public Methods
-        protected override void Execute()
+
+        public override void Execute(IMsgContext msgContext)
         {
             //Get the message info
             //m_MessageInfo = (m_MessageInfo != null) ? m_MessageInfo : SerializationUtilities<FtpMessageInfo>.Soap.Deserialize(MessageContext.MailMessage.XmlDoc);
 
             //Get configuration
-            //GetConfigValues();
+            GetConfigValues(WorkerSettings);
 
             //initialize all collections
             InitializeLocalCollections();
@@ -281,6 +283,10 @@ namespace Logistic.Integration.Library.Logistics
                 throw new IntegrationException(errorRecord, processException);
             }
         }
+
+        #endregion
+
+        #region protected Methods
 
         protected void LoadDictionaries()
         {
