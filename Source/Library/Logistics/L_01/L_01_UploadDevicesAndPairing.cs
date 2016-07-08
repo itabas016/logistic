@@ -92,9 +92,17 @@ namespace Logistic.Integration.Library.Logistics
 
         #endregion
 
+        #region Ctor
+
+        public L_01_UploadDevicesAndPairing(IMsgContext msgContext) : base(msgContext)
+        {
+        }
+
+        #endregion
+
         #region Public Methods
 
-        public override void Execute(IMsgContext msgContext)
+        public override void Execute()
         {
             //Get the message info
             //m_MessageInfo = (m_MessageInfo != null) ? m_MessageInfo : SerializationUtilities<FtpMessageInfo>.Soap.Deserialize(MessageContext.MailMessage.XmlDoc);
@@ -452,7 +460,7 @@ namespace Logistic.Integration.Library.Logistics
 
                 int resultCount;
 
-                using (IDataAccess da = DataAccessFactory.CreateDataAccess(MessageContext.MailMessage.Dsn))
+                using (IDataAccess da = DataAccessFactory.CreateDataAccess(Common.Configuration.AppSettings.IntegrationDataDsn))
                 {
                     runId = Convert.ToInt32(da.ExecuteScalar("select NVL (MAX (RUN_ID), 0) + 1 from CI_DEVICE_IMPORT_LOG "));
                     if (runId != logRecord.RunID)
@@ -1297,20 +1305,21 @@ namespace Logistic.Integration.Library.Logistics
 
                 // the calls to the IbsCoreUtilities really like and need the MessageContext to be set to our IntegrationMailMessage.
                 // note: I could extend our core wrapper to take a dsn, but I'm being lazy today to I will simply set the context on this thread.
-                using (new MessageContext(this.BaseMailMessage))
+                //using (new MessageContext(this.BaseMailMessage))
+                //{
+                    
+                //}
+                Device device = DeviceUtilities.GetDeviceBySerialNumber(serialNumber);
+                if (device != null)
                 {
-                    Device device = DeviceUtilities.GetDeviceBySerialNumber(serialNumber);
-                    if (device != null)
+                    CustomFieldUtilities.UpdateCustomFieldValues(device.Id.GetValueOrDefault(), Device.ENTITY_ID, updateCustomFieldParams.customFieldValueCollection);
+                }
+                if (!string.IsNullOrEmpty(secondSerialNumber))
+                {
+                    Device secondDevice = DeviceUtilities.GetDeviceBySerialNumber(secondSerialNumber);
+                    if (secondDevice != null)
                     {
-                        CustomFieldUtilities.UpdateCustomFieldValues(device.Id.GetValueOrDefault(), Device.ENTITY_ID, updateCustomFieldParams.customFieldValueCollection);
-                    }
-                    if (!string.IsNullOrEmpty(secondSerialNumber))
-                    {
-                        Device secondDevice = DeviceUtilities.GetDeviceBySerialNumber(secondSerialNumber);
-                        if (secondDevice != null)
-                        {
-                            CustomFieldUtilities.UpdateCustomFieldValues(secondDevice.Id.GetValueOrDefault(), Device.ENTITY_ID, updateCustomFieldParams.customFieldValueCollection);
-                        }
+                        CustomFieldUtilities.UpdateCustomFieldValues(secondDevice.Id.GetValueOrDefault(), Device.ENTITY_ID, updateCustomFieldParams.customFieldValueCollection);
                     }
                 }
             }

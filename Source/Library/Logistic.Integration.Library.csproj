@@ -51,6 +51,12 @@
     <Reference Include="PayMedia.ApplicationServices.SharedContracts">
       <HintPath>..\..\Reference\PayMedia.ApplicationServices.SharedContracts.dll</HintPath>
     </Reference>
+    <Reference Include="PayMedia.Integration.FrameworkService.Common">
+      <HintPath>..\..\Reference\PayMedia.Integration.FrameworkService.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="PayMedia.Integration.FrameworkService.Interfaces">
+      <HintPath>..\..\Reference\PayMedia.Integration.FrameworkService.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -80,6 +86,17 @@
       <Project>{48474933-02b3-4d24-83fe-9b5bda49a7c2}</Project>
       <Name>Logistic.Integration.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Logistics\L_01\application_setting.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Logistics\L_01\general_configuration_setting.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Logistics\L_01\worker_setting.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

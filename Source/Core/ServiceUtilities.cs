@@ -84,9 +84,9 @@ namespace Logistic.Integration.Core
             {
                 // Get the credentials.
                 // Note: Certificate authentication is being used so the proof must be null.
-                string username = MessageContext.MailMessage.HistoryUserName;
-                string proof = null;
-                string dsn = MessageContext.MailMessage.Dsn;
+                string username = Common.Configuration.AppSettings.AsmUsername;
+                string proof = Common.Configuration.AppSettings.AsmPassword;
+                string dsn = Common.Configuration.AppSettings.IntegrationDataDsn;
 
                 service = ServiceUtilities.GetService<T>(username, proof, dsn);
             }
@@ -95,7 +95,7 @@ namespace Logistic.Integration.Core
                 // Get the service using the context's DSN and the application's authentication.
                 // NOTE: If certs are not being used then a password is required, which can
                 //       only come from the application's authentication
-                service = GetService<T>(MessageContext.MailMessage.Dsn);
+                service = GetService<T>(Common.Configuration.AppSettings.IntegrationDataDsn);
             }
 
             // Return the service.
@@ -118,7 +118,7 @@ namespace Logistic.Integration.Core
             }
             else
             {
-                proof = "";//Configuration.AppSettings.AsmPassword;
+                proof = Common.Configuration.AppSettings.AsmPassword;
             }
 
             if (!String.IsNullOrEmpty(ContextUsername))
@@ -127,7 +127,7 @@ namespace Logistic.Integration.Core
             }
             else
             {
-                username = ""; //Configuration.AppSettings.AsmUsername;
+                username = Common.Configuration.AppSettings.AsmUsername;
             }
 
             // Return the service.

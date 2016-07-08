@@ -14,8 +14,8 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
     {
         public IMessageAction Process(IMsgContext msgContext)
         {
-            var instance = new L_01_UploadDevicesAndPairing();
-            instance.Execute(msgContext);
+            var instance = new L_01_UploadDevicesAndPairing(msgContext);
+            instance.Execute();
 
             return MessageAction.ContinueProcessing;
         }

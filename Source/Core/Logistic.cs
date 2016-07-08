@@ -20,6 +20,10 @@ namespace Logistic.Integration.Core
 
         [NonSerialized]
         [XmlIgnore]
+        public IMsgContext MsgContext;
+
+        [NonSerialized]
+        [XmlIgnore]
         public XmlNode WorkerSettings;
 
         [NonSerialized]
@@ -48,28 +52,41 @@ namespace Logistic.Integration.Core
 
         #endregion
 
-        public virtual void Execute(IMsgContext msgContext)
+        #region Ctor
+
+        public Logistic(IMsgContext msgContext)
+        {
+            this.MsgContext = msgContext;
+        }
+
+        #endregion
+
+        #region Public Method
+
+        public virtual void Execute()
         {
 
         }
+
+        #endregion
 
         #region protected Methods
 
         protected virtual IDevicesService GetIBSDevicesService()
         {
-            IDevicesService service = ServiceUtilities.GetService<IDevicesService>(baseMailMessage.Dsn);
+            IDevicesService service = ServiceUtilities.GetService<IDevicesService>();
             return service;
         }
 
         protected virtual IDevicesConfigurationService GetIBSDevicesConfigurationService()
         {
-            IDevicesConfigurationService service = ServiceUtilities.GetService<IDevicesConfigurationService>(baseMailMessage.Dsn);
+            IDevicesConfigurationService service = ServiceUtilities.GetService<IDevicesConfigurationService>();
             return service;
         }
 
         protected virtual IScheduleManagerService GetScheduleManagerService()
         {
-            IScheduleManagerService service = ServiceUtilities.GetService<IScheduleManagerService>(baseMailMessage.Dsn);
+            IScheduleManagerService service = ServiceUtilities.GetService<IScheduleManagerService>();
             return service;
         }
 
