@@ -148,7 +148,7 @@ namespace Logistic.Integration.Common
 
         private static XmlNode LoadWorkerConfiguration()
         {
-            var workerSettings = XmlUtilities.StringToXmlNode(LoadXml(@"\Library\Logistics\L_01\worker_setting.xml"));
+            var workerSettings = XmlUtilities.StringToXmlNode(GetFileResource(@"\L_01\worker_setting.xml"));
             return workerSettings;
         }
 
@@ -157,12 +157,13 @@ namespace Logistic.Integration.Common
             Dictionary<string, Dictionary<string, string>> generalConfiguration =
                 new Dictionary<string, Dictionary<string, string>>();
 
-            var generalXmlNode = XmlUtilities.StringToXmlNode(LoadXml(@"\Library\Logistics\L_01\general_configuration_setting.xml"));
+            var generalXmlNode = XmlUtilities.StringToXmlNode(GetFileResource(@"\L_01\general_configuration_setting.xml"));
 
             // Get the configuration details.
-            string groupName = XmlUtilities.SafeSelect(generalXmlNode, "GROUP_NAME").InnerText;
-            string keyName = XmlUtilities.SafeSelect(generalXmlNode, "KEY_NAME").InnerText;
-            string configValue = XmlUtilities.SafeSelect(generalXmlNode, "VALUE").InnerText;
+            string groupName = XmlUtilities.SafeSelectText(generalXmlNode, "//group/@name");
+
+            var groupSettings = XmlUtilities.SafeSelectList(generalXmlNode, "//group//setting");
+            
 
             // Get the group config dictionary.
             Dictionary<string, string> groupConfiguration;
@@ -174,15 +175,24 @@ namespace Logistic.Integration.Common
             {
                 groupConfiguration = new Dictionary<string, string>();
                 generalConfiguration.Add(groupName, groupConfiguration);
-            }
 
-            // Add the new key to the group.
-            if (groupConfiguration.ContainsKey(keyName))
-                throw new IntegrationException(
-                    string.Format(
-                        "The config key {0} exists more than once under group {1} in the general configuration of app {2}.",
-                        keyName, groupName, AppSettings.ApplicationName));
-            groupConfiguration.Add(keyName, configValue);
+                if (groupSettings != null && groupSettings.Count > 0)
+                {
+                    foreach (var item in groupSettings)
+                    {
+                        string keyName = ((XmlNode)item).Attributes["key"].Value.ToString(); //XmlUtilities.SafeSelectText((XmlNode)item, "//setting/@key");
+                        string configValue = ((XmlNode)item).Attributes["value"].Value.ToString(); //XmlUtilities.SafeSelectText((XmlNode)item, "//setting/@value");
+
+                        // Add the new key to the group.
+                        if (groupConfiguration.ContainsKey(keyName))
+                            throw new IntegrationException(
+                                string.Format(
+                                    "The config key {0} exists more than once under group {1} in the general configuration of app {2}.",
+                                    keyName, groupName, AppSettings.ApplicationName));
+                        groupConfiguration.Add(keyName, configValue);
+                    }
+                }
+            }
 
             return generalConfiguration;
         }
@@ -218,13 +228,13 @@ namespace Logistic.Integration.Common
 
             #region Application setting configuration
 
-            var applicationXmlNode = XmlUtilities.StringToXmlNode(LoadXml(@"\Library\Logistics\L_01\application_setting.xml"));
+            var applicationXmlNode = XmlUtilities.StringToXmlNode(GetFileResource(@"\L_01\application_setting.xml"));
             appSettings.ApplicationID = ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(applicationXmlNode, "IC_ID").InnerText);
             appSettings.ApplicationName = appName;
             appSettings.AsmUsername = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_USERNAME").InnerText;
             appSettings.AsmPassword = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_PASSWORD").InnerText;
             appSettings.IntegrationDataDsn = XmlUtilities.SafeSelect(applicationXmlNode, "CI_CENTRAL_DSN").InnerText;
-            appSettings.IsCertAuthEnabled = ValidationUtilities.ParseDbBool(XmlUtilities.SafeSelect(applicationXmlNode, "IS_CERT_AUTH_ENABLED").InnerText);
+            appSettings.IsCertAuthEnabled = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(applicationXmlNode, "IS_CERT_AUTH_ENABLED").InnerText);
             appSettings.ConditionValidatorTypename = XmlUtilities.SafeSelect(applicationXmlNode, "CONDITION_VALIDATOR_TYPENAME").InnerText;
             appSettings.CoreServiceLocator = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_SERVICE_LOCATOR").InnerText;
             appSettings.TempFolderPath = "";
@@ -243,11 +253,13 @@ namespace Logistic.Integration.Common
 
         }
 
-        private static string LoadXml(string filePath)
+        private static string GetFileResource(string filePath)
         {
             try
             {
-                var result = File.ReadAllText(filePath);
+                var fileDirectoryPrefix = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Configuration)).Location);
+                
+                var result = File.ReadAllText(string.Format(@"{0}..\{1}", fileDirectoryPrefix, filePath));
                 return result;
             }
             catch (Exception ex)

@@ -78,6 +78,18 @@
     <Compile Include="Logistics\L_01\L_01_Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Logistics\L_01\application_setting.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Logistics\L_01\general_configuration_setting.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Logistics\L_01\worker_setting.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Common\Logistic.Integration.Common.csproj">
       <Project>{ad5d5920-eb04-4d83-8eb0-bc811e3f54af}</Project>
       <Name>Logistic.Integration.Common</Name>
@@ -88,15 +100,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Logistics\L_01\application_setting.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Logistics\L_01\general_configuration_setting.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Logistics\L_01\worker_setting.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

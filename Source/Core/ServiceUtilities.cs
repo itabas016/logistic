@@ -52,7 +52,7 @@ namespace Logistic.Integration.Core
 
         static ServiceUtilities()
         {
-            string AsmServiceLocatorUrl = ""; //Configuration.AppSettings.CoreServiceLocator;
+            string AsmServiceLocatorUrl = Common.Configuration.AppSettings.CoreServiceLocator;
             bool useAsmWeakReferenceCaching = false;
             int wcfProxiesPerUser = 0;
 

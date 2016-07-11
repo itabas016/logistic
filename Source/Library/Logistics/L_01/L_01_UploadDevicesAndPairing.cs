@@ -104,9 +104,6 @@ namespace Logistic.Integration.Library.Logistics
 
         public override void Execute()
         {
-            //Get the message info
-            //m_MessageInfo = (m_MessageInfo != null) ? m_MessageInfo : SerializationUtilities<FtpMessageInfo>.Soap.Deserialize(MessageContext.MailMessage.XmlDoc);
-
             //Get configuration
             GetConfigValues(WorkerSettings);
 
@@ -114,7 +111,8 @@ namespace Logistic.Integration.Library.Logistics
             InitializeLocalCollections();
 
             // Process the file.
-            string InputFilePath = m_MessageInfo.FilePath;
+            // should be get from MsgConext
+            string InputFilePath = "";
 
             // Archive the file and rename the extension
             string originalFileName = Path.GetFileName(InputFilePath);
@@ -451,7 +449,7 @@ namespace Logistic.Integration.Library.Logistics
                 string[] fileName = inputFilePath.Split(delimiterChars);
                 logRecord.RunID = Convert.ToInt32(fileName[2].ToString());
                 logRecord.ID = 0;
-                logRecord.SourceURI = m_MessageInfo.FtpUrl + "/" + originalFileName;
+                logRecord.SourceURI = ftpUrl + "/" + originalFileName;
                 logRecord.ArchivePath = archivePath;
                 if (fileName.Length > 4)
                 {
@@ -521,7 +519,7 @@ namespace Logistic.Integration.Library.Logistics
         {
             try
             {
-                using (IDataAccess da = DataAccessFactory.CreateDataAccess(MessageContext.MailMessage.Dsn))
+                using (IDataAccess da = DataAccessFactory.CreateDataAccess(Common.Configuration.AppSettings.IntegrationDataDsn))
                 {
                     //TODO: Turn this in to parameterized SQL.
                     string updateSql = "Update CI_DEVICE_IMPORT_LOG " +
@@ -1048,7 +1046,7 @@ namespace Logistic.Integration.Library.Logistics
 
         private void InitializeLocalCollections()
         {
-            this.l_01_utils = new L_01_Utils("", this.externalStockHandlerID);
+            this.l_01_utils = new L_01_Utils(Common.Configuration.AppSettings.IntegrationDataDsn, this.externalStockHandlerID);
 
             DevicesList = new List<DeviceImportRecord>();
             serialNumbers = new Dictionary<string, DeviceImportRecord>();
