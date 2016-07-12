@@ -63,7 +63,7 @@ namespace Logistic.Integration.Core
 
         #region Public Method
 
-        public virtual void Execute()
+        public virtual void Execute(FtpMessageInfo messageInfo)
         {
 
         }

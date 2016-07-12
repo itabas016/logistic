@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FtpWatcherHelper.cs" />
     <Compile Include="L01.cs" />
     <Compile Include="Logistics\L_01\DeviceImportLogRecord.cs" />
     <Compile Include="Logistics\L_01\DeviceImportRecord.cs" />

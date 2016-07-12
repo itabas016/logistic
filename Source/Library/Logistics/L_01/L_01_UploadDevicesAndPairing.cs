@@ -102,7 +102,7 @@ namespace Logistic.Integration.Library.Logistics
 
         #region Public Methods
 
-        public override void Execute()
+        public override void Execute(FtpMessageInfo messageInfo)
         {
             //Get configuration
             GetConfigValues(WorkerSettings);
@@ -111,8 +111,7 @@ namespace Logistic.Integration.Library.Logistics
             InitializeLocalCollections();
 
             // Process the file.
-            // should be get from MsgConext
-            string InputFilePath = "";
+            string InputFilePath = messageInfo.FilePath;
 
             // Archive the file and rename the extension
             string originalFileName = Path.GetFileName(InputFilePath);

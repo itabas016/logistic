@@ -50,14 +50,17 @@
     <Compile Include="Configuration\ApplicationSettings.cs" />
     <Compile Include="Cache.cs" />
     <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Configuration\FtpWatcherConfiguration.cs" />
     <Compile Include="Exception\ConfigurationException.cs" />
     <Compile Include="Const.cs" />
     <Compile Include="DeviceType.cs" />
     <Compile Include="Diagnostics.cs" />
+    <Compile Include="FileUtilities.cs" />
     <Compile Include="Ftp\DirectoryEntryTypes.cs" />
     <Compile Include="Ftp\FtpClient.cs" />
     <Compile Include="Ftp\FtpDirectory.cs" />
     <Compile Include="Ftp\FtpFileInfo.cs" />
+    <Compile Include="Ftp\FtpMessageInfo.cs" />
     <Compile Include="Ftp\IFtpFileInfo.cs" />
     <Compile Include="Exception\IntegrationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
