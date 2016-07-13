@@ -17,6 +17,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         public L01(IComponentInitContext componentInitContext)
         {
+            Thread.Sleep(20000);
             _ftpWatcher = new FtpWatcherHelper(componentInitContext);
             var instance = new L_01_UploadDevicesAndPairing(componentInitContext);
             _ftpWatcher.OnFileReceived += new FtpWatcherHelper.ProcessFileReceived(instance.Execute);
@@ -25,11 +26,15 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         ~L01()
         {
+            Configuration.ClearConfiguration();
+
             _ftpWatcher.ForceStop();
         }
 
         public void Dispose()
         {
+            Configuration.ClearConfiguration();
+
             _ftpWatcher.RequestStop(60000);
         }
 

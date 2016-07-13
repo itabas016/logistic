@@ -5,7 +5,7 @@
   <StringDelimiter>|</StringDelimiter>
   <DeviceTypePaired>PAIRED</DeviceTypePaired>
   <ManufacturerStockHandlerID>10</ManufacturerStockHandlerID>
-  <BuildListImportPath>\\ibsism1\L_01_Import\</BuildListImportPath>
+  <BuildListImportPath>C:\L_01_Import\</BuildListImportPath>
   <DefaultSmartCardModelName>SCV24</DefaultSmartCardModelName>
   <LocationIDCustomField>ExternalStockHandlerID</LocationIDCustomField>
   <ftpUrl>ftp://192.168.193.179/SAP/Logistics/L_01/</ftpUrl>
