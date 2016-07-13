@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Logistic.Integration.Library.Logistics
+namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
     [Serializable]
     public class DeviceImportRecordThreadParam

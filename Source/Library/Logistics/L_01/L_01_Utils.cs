@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Logistic.Integration.Common;
-using Logistic.Integration.Core;
 using PayMedia.ApplicationServices.CustomFields.ServiceContracts;
 using PayMedia.ApplicationServices.CustomFields.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.Devices.ServiceContracts;
@@ -17,7 +15,7 @@ using PayMedia.ApplicationServices.ProductCatalog.ServiceContracts.DataContracts
 using PayMedia.ApplicationServices.SharedContracts;
 using LookupLists = PayMedia.ApplicationServices.Devices.ServiceContracts.LookupLists;
 
-namespace Logistic.Integration.Library
+namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
     public class L_01_Utils
     {

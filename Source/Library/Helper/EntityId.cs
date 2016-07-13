@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
-    [Serializable]
-    public class LocationIDModelName
+    public enum EntityId
     {
-        public string LocationID;
-        public string ModelName;
-        public string DeviceStatusCode;
+        Customer = 1,
+        Agreement = 23,
+        AgreementDetail = 24,
+        ShippingOrder = 11,
+        ShippingOrderLine = 26
     }
 }

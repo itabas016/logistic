@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Logistic.Integration.Common;
+using PayMedia.Integration.IFComponents.BBCL.Logistics;
 using NUnit.Framework;
 
-namespace Logistic.Integration.Tests.Common
+namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
 {
     [TestFixture]
     public class UnitTester

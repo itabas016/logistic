@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Entriq.DataAccess;
-using Logistic.Integration.Common;
-using Logistic.Integration.Core;
 using PayMedia.ApplicationServices.Devices.ServiceContracts;
 using PayMedia.ApplicationServices.Devices.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts;
@@ -19,10 +17,10 @@ using PayMedia.ApplicationServices.SharedContracts;
 using PayMedia.Integration.FrameworkService.Interfaces.Common;
 using LookupLists = PayMedia.ApplicationServices.Devices.ServiceContracts.LookupLists;
 
-namespace Logistic.Integration.Library.Logistics
+namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
     [Serializable]
-    public class L_01_UploadDevicesAndPairing : Core.Logistic
+    public class L_01_UploadDevicesAndPairing : Logistic
     {
         #region Properties
 
@@ -457,7 +455,7 @@ namespace Logistic.Integration.Library.Logistics
 
                 int resultCount;
 
-                using (IDataAccess da = DataAccessFactory.CreateDataAccess(Common.Configuration.AppSettings.IntegrationDataDsn))
+                using (IDataAccess da = DataAccessFactory.CreateDataAccess(Configuration.AppSettings.IntegrationDataDsn))
                 {
                     runId = Convert.ToInt32(da.ExecuteScalar("select NVL (MAX (RUN_ID), 0) + 1 from CI_DEVICE_IMPORT_LOG "));
                     if (runId != logRecord.RunID)
@@ -518,7 +516,7 @@ namespace Logistic.Integration.Library.Logistics
         {
             try
             {
-                using (IDataAccess da = DataAccessFactory.CreateDataAccess(Common.Configuration.AppSettings.IntegrationDataDsn))
+                using (IDataAccess da = DataAccessFactory.CreateDataAccess(Configuration.AppSettings.IntegrationDataDsn))
                 {
                     //TODO: Turn this in to parameterized SQL.
                     string updateSql = "Update CI_DEVICE_IMPORT_LOG " +
@@ -1045,7 +1043,7 @@ namespace Logistic.Integration.Library.Logistics
 
         private void InitializeLocalCollections()
         {
-            this.l_01_utils = new L_01_Utils(Common.Configuration.AppSettings.IntegrationDataDsn, this.externalStockHandlerID);
+            this.l_01_utils = new L_01_Utils(Configuration.AppSettings.IntegrationDataDsn, this.externalStockHandlerID);
 
             DevicesList = new List<DeviceImportRecord>();
             serialNumbers = new Dictionary<string, DeviceImportRecord>();

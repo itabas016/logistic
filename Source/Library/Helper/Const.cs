@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
-    [Serializable]
-    public class LocationIDModelName
+    public class Const
     {
-        public string LocationID;
-        public string ModelName;
-        public string DeviceStatusCode;
     }
 }

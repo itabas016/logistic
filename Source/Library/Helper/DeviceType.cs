@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
-    [Serializable]
-    public class LocationIDModelName
+    public enum DeviceType
     {
-        public string LocationID;
-        public string ModelName;
-        public string DeviceStatusCode;
+        SetupBox = 0,
+        SmartCard = 1,
     }
 }

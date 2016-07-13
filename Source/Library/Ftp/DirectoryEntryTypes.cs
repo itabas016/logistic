@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
-    [Serializable]
-    public class LocationIDModelName
+    /// <summary>
+    /// Identifies entry as either File or Directory
+    /// </summary>
+    public enum DirectoryEntryTypes
     {
-        public string LocationID;
-        public string ModelName;
-        public string DeviceStatusCode;
+        File,
+        Directory
     }
 }

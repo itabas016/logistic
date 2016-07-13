@@ -7,9 +7,8 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Logistic.Integration.Common;
 
-namespace Logistic.Integration.Library.Logistics
+namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
     public class FtpWatcherHelper
     {
