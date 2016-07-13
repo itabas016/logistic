@@ -11,16 +11,30 @@ using PayMedia.Integration.FrameworkService.Interfaces.Common;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
-    public class L01 : IFComponent, IComponentInitContext
+    public class L01 : IFComponent, IComponentInitContext, IDisposable
     {
+        private FtpWatcherHelper _ftpWatcher;
+
+        public L01(IComponentInitContext componentInitContext)
+        {
+            _ftpWatcher = new FtpWatcherHelper(componentInitContext);
+            var instance = new L_01_UploadDevicesAndPairing(componentInitContext);
+            _ftpWatcher.OnFileReceived += new FtpWatcherHelper.ProcessFileReceived(instance.Execute);
+            _ftpWatcher.RequestStart();
+        }
+
+        ~L01()
+        {
+            _ftpWatcher.ForceStop();
+        }
+
+        public void Dispose()
+        {
+            _ftpWatcher.RequestStop(60000);
+        }
+
         public IMessageAction Process(IMsgContext msgContext)
         {
-            Thread.Sleep(10000);
-            var ftpWatcher = new FtpWatcherHelper();
-            var instance = new L_01_UploadDevicesAndPairing(msgContext);
-            ftpWatcher.OnFileReceived += new FtpWatcherHelper.ProcessFileReceived(instance.Execute);
-            ftpWatcher.RequestStart();
-
             return MessageAction.ContinueProcessing;
         }
 

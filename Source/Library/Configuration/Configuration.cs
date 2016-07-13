@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using PayMedia.Integration.FrameworkService.Interfaces.Common;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
@@ -116,11 +117,62 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         /// <summary>
         /// Gets a worker's configuration.
         /// </summary>
-        /// <param name="workerName">Name of the worker.</param>
         /// <returns></returns>
-        public static XmlNode GetWorkerConfiguration()
+        public static XmlNode GetWorkerConfiguration(IComponentInitContext componentInitContext)
         {
-            return LoadWorkerConfiguration();
+            XmlNode workerSettingXmlNode;
+
+            lock (workerConfigLocker)
+            {
+                try
+                {
+                    workerSettingXmlNode = (XmlNode) Cache.Get("WorkerConfiguration");
+                }
+                catch (KeyNotFoundException)
+                {
+                    if (componentInitContext == null | string.IsNullOrEmpty(componentInitContext.Config[Const.PROP_WORKER_SETTING]))
+                    {
+                        throw new KeyNotFoundException(
+                            string.Format(
+                                "The config key {0} was not found in component property."));
+                    }
+                    // Load and cache the configuration.
+                    workerSettingXmlNode = LoadWorkerConfiguration(componentInitContext.Config[Const.PROP_WORKER_SETTING]);
+                    Cache.Add("WorkerConfiguration", workerSettingXmlNode);
+                }
+            }
+            return workerSettingXmlNode;
+        }
+
+        public static FtpWatcherConfiguration GetFtpWatcherConfiguration(IComponentInitContext componentInitContext)
+        {
+            FtpWatcherConfiguration watcher = new FtpWatcherConfiguration();
+
+            var workerSetting = GetWorkerConfiguration(componentInitContext);
+
+            watcher.Name = XmlUtilities.SafeSelect(workerSetting, "MessageName").InnerText;
+            watcher.DeleteAfterDownloading = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(workerSetting, "DeleteAfterDownloading").InnerText);
+            watcher.PollingFileExtensions = ValidationUtilities.Split(XmlUtilities.SafeSelect(workerSetting, "FileExtensionList").InnerText, 1, true, ",");
+            watcher.PollingEndpoint = new FtpEndpoint();
+            watcher.PollingEndpoint.Name = watcher.Name;
+            watcher.PollingEndpoint.Address = XmlUtilities.SafeSelect(workerSetting, "ftpUrl").InnerText;
+            watcher.PollingEndpoint.Username = XmlUtilities.SafeSelect(workerSetting, "UserName").InnerText;
+            watcher.PollingEndpoint.Password = XmlUtilities.SafeSelect(workerSetting, "Pass").InnerText;
+            watcher.PollingEndpoint.TransferInterval = new TimeSpan(0, 0, 0, 0, ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(workerSetting, "TransferIntervalMs").InnerText));
+            watcher.PollingEndpoint.InTransitFileExtension = XmlUtilities.SafeSelect(workerSetting, "TransitFileExtension").InnerText;
+
+            // Storage values.
+            watcher.StorageFilePath = XmlUtilities.SafeSelect(workerSetting, "StoragePath").InnerText;
+
+            // Forwarding values.
+            //watcher.ForwardingEndpoint = CreateEndpoint(ValidationUtilities.ParseInt(reader, "ENDPOINT_TYPE_ID"));
+            //watcher.ForwardingEndpoint.InitFromDataReader(reader);
+            //string dsn = ValidationUtilities.ParseString(reader, "CONTEXT_DSN");
+            //string conditionName = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_NAME");
+            //string conditionValue = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_VALUE");
+            //watcher.ForwardingMailMessage = new IntegrationMailMessage(0, conditionName, conditionValue, 0, dsn, string.Empty, null, string.Empty);
+
+            return watcher;
         }
 
         /// <summary>
@@ -146,9 +198,9 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         #region Private Methods
 
-        private static XmlNode LoadWorkerConfiguration()
+        private static XmlNode LoadWorkerConfiguration(string configuration)
         {
-            var workerSettings = XmlUtilities.StringToXmlNode(GetFileResource(@"\L_01\worker_setting.xml"));
+            var workerSettings = XmlUtilities.StringToXmlNode(configuration); //GetFileResource(@"\L_01\worker_setting.xml")
             return workerSettings;
         }
 

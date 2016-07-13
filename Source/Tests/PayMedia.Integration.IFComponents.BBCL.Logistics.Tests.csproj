@@ -33,6 +33,13 @@
     <Reference Include="nunit.framework">
       <HintPath>..\..\Reference\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="PayMedia.Integration.FrameworkService.Interfaces, Version=62.24.0.0, Culture=neutral, PublicKeyToken=c8d07e2301cbe008, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Reference\PayMedia.Integration.FrameworkService.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Mocks">
+      <HintPath>..\..\Reference\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

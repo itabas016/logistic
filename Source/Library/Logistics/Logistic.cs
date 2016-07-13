@@ -19,7 +19,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         [NonSerialized]
         [XmlIgnore]
-        public IMsgContext MsgContext;
+        public IComponentInitContext Context;
 
         [NonSerialized]
         [XmlIgnore]
@@ -53,9 +53,9 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         #region Ctor
 
-        public Logistic(IMsgContext msgContext)
+        public Logistic(IComponentInitContext componentInitContext)
         {
-            this.MsgContext = msgContext;
+            this.Context = componentInitContext;
         }
 
         #endregion

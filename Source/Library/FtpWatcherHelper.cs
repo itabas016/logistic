@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using PayMedia.Integration.FrameworkService.Interfaces.Common;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 {
@@ -29,7 +30,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         //Added - 
         //private string perfmonInstanceName;
         //private IBSPerformanceListenerInstance perfmonInstance;
-        private long start;
+        //private long start;
         //private Manager manager;
 
         #endregion
@@ -38,51 +39,14 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         /// Initializes a new instance of the <see cref="FtpListener"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public FtpWatcherHelper()
+        public FtpWatcherHelper(IComponentInitContext componentInitContext)
         {
             //perfmonInstanceName = configuration.Name == string.Empty ? "FtpWatcher" : configuration.Name;
             //Init ftp configuration
 
-            this.configuration = InitConfiguration();
+            this.configuration = Configuration.GetFtpWatcherConfiguration(componentInitContext);
             this.runningLocker = new object();
             //this.manager = (Manager)configuration.Manager;
-        }
-
-        public FtpWatcherConfiguration InitConfiguration()
-        {
-            /*
-            FtpWatcherConfiguration watcher = new FtpWatcherConfiguration();
-
-            // FTP values.
-            watcher.Name = ValidationUtilities.ParseString(reader, "FTP_WATCHER_NAME");
-
-            watcher.DeleteAfterDownloading = ValidationUtilities.ParseBool(reader, "DELETE_AFTER_DOWNLOADING");
-            watcher.PollingFileExtensions = ValidationUtilities.Split(ValidationUtilities.ParseString(reader, "FILE_EXTENSION_LIST"), 1, true, ",");
-            watcher.PollingEndpoint = new FtpEndpoint();
-            watcher.PollingEndpoint.Name = watcher.Name;
-            watcher.PollingEndpoint.Settings = ValidationUtilities.ParseString(reader, "FTP_ENDPOINT_SETTINGS", true);
-            watcher.PollingEndpoint.Address = ValidationUtilities.ParseString(reader, "SOURCE_FTP_ADDRESS");
-            watcher.PollingEndpoint.Username = ValidationUtilities.ParseString(reader, "SOURCE_FTP_USERNAME");
-            watcher.PollingEndpoint.Password = ValidationUtilities.ParseString(reader, "SOURCE_FTP_PASSWORD");
-            watcher.PollingEndpoint.TransferInterval = new TimeSpan(0, 0, 0, 0, ValidationUtilities.ParseInt(reader, "SOURCE_TRANSFER_INTERVAL_MS"));
-            watcher.PollingEndpoint.InTransitFileExtension = ValidationUtilities.ParseString(reader, "RENAME_AFTER_DL_EXT", true);
-
-            // Storage values.
-            FilePathEndpoint filePath = new FilePathEndpoint();
-            filePath.Path = ValidationUtilities.ParseString(reader, "STORAGE_PATH");
-            filePath.SpecialFolderName = ValidationUtilities.ParseString(reader, "STORAGE_SPECIAL_FOLDER", true);
-            watcher.StorageFilePath = filePath.AbsolutePath;
-
-            // Forwarding values.
-            watcher.ForwardingEndpoint = CreateEndpoint(ValidationUtilities.ParseInt(reader, "ENDPOINT_TYPE_ID"));
-            watcher.ForwardingEndpoint.InitFromDataReader(reader);
-            string dsn = ValidationUtilities.ParseString(reader, "CONTEXT_DSN");
-            string conditionName = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_NAME");
-            string conditionValue = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_VALUE");
-            watcher.ForwardingMailMessage = new IntegrationMailMessage(0, conditionName, conditionValue, 0, dsn, string.Empty, null, string.Empty);
-            */
-
-            return new FtpWatcherConfiguration();
         }
 
         public void RequestStart()
@@ -150,14 +114,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     (
                         configuration.PollingEndpoint.Address,
                         configuration.PollingEndpoint.Username,
-                        configuration.PollingEndpoint.Password,
-                        configuration.PollingEndpoint.Settings
+                        configuration.PollingEndpoint.Password
                     );
 
                 while (continueProcessing)
                 {
                     TimeSpan sleepTime = configuration.PollingEndpoint.TransferInterval;
-                    start = Stopwatch.GetTimestamp();
                     try
                     {
                         foreach (string pollingExtension in configuration.PollingFileExtensions)
@@ -244,7 +206,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 string error = string.Format("Error occurred while trying to Start FTP Watcher.  Please check your Configuration\r\n{0}\r\n", ex.ToString());
                 LogError(error);
-                //manager.ScheduleShutdown(30);
+                RequestStop(30);
             }
         }
 

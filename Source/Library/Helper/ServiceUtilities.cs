@@ -56,8 +56,8 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             int wcfProxiesPerUser = 0;
 
             // Attempt to read WCFProxiesPerUser configuration setting
-            if (!int.TryParse(ConfigurationManager.AppSettings["WCFProxiesPerUser"], out wcfProxiesPerUser))
-                throw new IntegrationException("Unable to read setting \"WCFProxiesPerUser\" from the IC config file.  Please verify this setting is present and valid.");
+            //if (!int.TryParse(ConfigurationManager.AppSettings["WCFProxiesPerUser"], out wcfProxiesPerUser))
+                //throw new IntegrationException("Unable to read setting \"WCFProxiesPerUser\" from the IC config file.  Please verify this setting is present and valid.");
 
             // 2010.12.03 JCopus - At the moment weak references do NOT really work in the core client proxy and I'm not going
             // to spend time added the extra configuraiton field to IC main to support it.  Once we whould add it in the hopes

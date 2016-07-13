@@ -18,7 +18,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         public string StorageFilePath;
 
         // Forwarding values.
-        public IEndpoint ForwardingEndpoint;
+        //public IEndpoint ForwardingEndpoint;
         public bool DeleteAfterDownloading;
         public object Manager;
     }

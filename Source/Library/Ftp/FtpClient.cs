@@ -45,13 +45,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         /// <param name="Username">Leave blank to use 'anonymous' but set password to your email</param>
         /// <param name="Password"></param>
         /// <param name="EndpointSettings"></param>
-		public FtpClient(string FTPAddress, string Username, string Password, string EndpointSettings)
+		public FtpClient(string FTPAddress, string Username, string Password)
         {
             _address = FTPAddress;
             setAddressProperties(FTPAddress);
             _username = Username;
             _password = Password;
-            _endPointSettings = LoadEndpointSettings(EndpointSettings);
+            //_endPointSettings = LoadEndpointSettings(EndpointSettings);
         }
 
         #endregion
