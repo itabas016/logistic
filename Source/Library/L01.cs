@@ -17,6 +17,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             var ftpWatcher = new FtpWatcherHelper();
             var instance = new L_01_UploadDevicesAndPairing(msgContext);
             ftpWatcher.OnFileReceived += new FtpWatcherHelper.ProcessFileReceived(instance.Execute);
+            ftpWatcher.RequestStart();
 
             return MessageAction.ContinueProcessing;
         }
