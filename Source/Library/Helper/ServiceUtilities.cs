@@ -177,7 +177,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     // if they are NOT there or there was any problems, log a warning and use our default values.
                     try
                     {
-                        string rawSetting = "";//Configuration.AppSettings.CommunicationLogServiceCache;
+                        string rawSetting = Configuration.AppSettings.CommunicationLogServiceCache;
 
                         if (rawSetting != null)
                         {

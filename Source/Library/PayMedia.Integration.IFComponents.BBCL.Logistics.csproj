@@ -120,18 +120,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Logistics\L_01\L_01_Utils.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Logistics\L_01\application_setting.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Logistics\L_01\general_configuration_setting.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Logistics\L_01\worker_setting.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

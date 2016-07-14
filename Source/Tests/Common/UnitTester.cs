@@ -22,9 +22,9 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
             Configuration.ClearConfiguration();
 
             _componentInitContext = MockRepository.GenerateMock<IComponentInitContext>();
-            var workerSettingString = GetFileResource(@"\Logistics\L_01\worker_setting.xml");
-            var applicationSetting = GetFileResource(@"\Logistics\L_01\application_setting.xml");
-            var generalSetting = GetFileResource(@"\Logistics\L_01\general_configuration_setting.xml");
+            var workerSettingString = GetFileResource(@"\L_01\worker_setting.xml");
+            var applicationSetting = GetFileResource(@"\L_01\application_setting.xml");
+            var generalSetting = GetFileResource(@"\L_01\general_setting.xml");
 
             var configuration = PropertySet.Create();
             configuration[Const.PROP_WORKER_SETTING] = workerSettingString;
@@ -77,7 +77,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
 
         private static string GetFileResource(string filePath)
         {
-            var fileDirectoryPrefix = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Configuration)).Location);
+            var fileDirectoryPrefix = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(UnitTester)).Location);
 
             var result = File.ReadAllText(string.Format(@"{0}..\{1}", fileDirectoryPrefix, filePath));
             return result;

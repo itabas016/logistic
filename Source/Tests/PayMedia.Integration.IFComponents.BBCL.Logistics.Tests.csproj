@@ -64,17 +64,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Library\Logistics\L_01\application_setting.xml">
-      <Link>L_01\application_setting.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="L_01\application_setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Library\Logistics\L_01\general_configuration_setting.xml">
-      <Link>L_01\general_configuration_setting.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="L_01\general_setting.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Library\Logistics\L_01\worker_setting.xml">
-      <Link>L_01\worker_setting.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="L_01\worker_setting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
