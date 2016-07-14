@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PayMedia.Integration.IFComponents.BBCL.Logistics;
 using NUnit.Framework;
+using PayMedia.Integration.FrameworkService.Common;
 using PayMedia.Integration.FrameworkService.Interfaces.Common;
 using Rhino.Mocks;
 using Rhino.Mocks.Utilities;
@@ -18,9 +19,21 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
         public IComponentInitContext _componentInitContext;
         public UnitTester()
         {
+            Configuration.ClearConfiguration();
+
             _componentInitContext = MockRepository.GenerateMock<IComponentInitContext>();
             var workerSettingString = GetFileResource(@"\Logistics\L_01\worker_setting.xml");
-            _componentInitContext.Stub(s => s.Config[Const.PROP_WORKER_SETTING]).Return(workerSettingString);
+            var applicationSetting = GetFileResource(@"\Logistics\L_01\application_setting.xml");
+            var generalSetting = GetFileResource(@"\Logistics\L_01\general_configuration_setting.xml");
+
+            var configuration = PropertySet.Create();
+            configuration[Const.PROP_WORKER_SETTING] = workerSettingString;
+            configuration[Const.PROP_APPLICATION_SETTING] = applicationSetting;
+            configuration[Const.PROP_GENERAL_SETTING] = generalSetting;
+
+            _componentInitContext.Stub(s => s.Config).Return((IReadOnlyPropertySet)configuration);
+
+            Configuration.Init(_componentInitContext);
         }
 
         #region Configuration
@@ -38,7 +51,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
         [Test]
         public void get_worker_setting_test()
         {
-            var workerSettingXmlNode = Configuration.GetWorkerConfiguration(_componentInitContext);
+            var workerSettingXmlNode = Configuration.WorkerSetting;
 
             var message_name = XmlUtilities.SafeSelect(workerSettingXmlNode, "MessageName").InnerText;
             var ftp_url = XmlUtilities.SafeSelect(workerSettingXmlNode, "ftpUrl").InnerText;
@@ -61,6 +74,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
             Assert.AreEqual("60", value_OperationTimeOutSeconds);
 
         }
+
         private static string GetFileResource(string filePath)
         {
             var fileDirectoryPrefix = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Configuration)).Location);

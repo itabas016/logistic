@@ -39,12 +39,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         /// Initializes a new instance of the <see cref="FtpListener"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        public FtpWatcherHelper(IComponentInitContext componentInitContext)
+        public FtpWatcherHelper(FtpWatcherConfiguration ftpWatcherConfiguration)
         {
             //perfmonInstanceName = configuration.Name == string.Empty ? "FtpWatcher" : configuration.Name;
             //Init ftp configuration
 
-            this.configuration = Configuration.GetFtpWatcherConfiguration(componentInitContext);
+            this.configuration = ftpWatcherConfiguration;
             this.runningLocker = new object();
             //this.manager = (Manager)configuration.Manager;
         }

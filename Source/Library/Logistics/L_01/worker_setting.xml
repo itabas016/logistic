@@ -12,7 +12,7 @@
   <UserName>anonymous</UserName>
   <Pass>anonymous</Pass>
   <FtpEndpoint></FtpEndpoint>
-  <DeleteAfterDownloading>0</DeleteAfterDownloading>
+  <DeleteAfterDownloading>false</DeleteAfterDownloading>
   <FileExtensionList>*.new,*.NEW</FileExtensionList>
   <TransferIntervalMs>1000</TransferIntervalMs>
   <TransitFileExtension>process</TransitFileExtension>

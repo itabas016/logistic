@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -17,6 +18,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         private static readonly object generalConfigLocker;
         private static readonly object locker;
         private static readonly object workerConfigLocker;
+        private static readonly object ftpwatcherLocker;
 
         #endregion
 
@@ -30,6 +32,22 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             locker = new object();
             generalConfigLocker = new object();
             workerConfigLocker = new object();
+            ftpwatcherLocker = new object();
+        }
+
+        /// <summary>
+        /// when use configuration, must be call this method, init configurations in cache
+        /// </summary>
+        /// <param name="componentInitContext"></param>
+        public static void Init(IComponentInitContext componentInitContext)
+        {
+            GetApplicationSettings(componentInitContext);
+
+            GetWorkerConfiguration(componentInitContext);
+
+            GetFtpWatcherConfiguration(componentInitContext);
+
+            GetGeneralConfiguration(componentInitContext);
         }
 
         /// <summary>
@@ -39,28 +57,60 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         {
             get
             {
-                ApplicationSettings appSettings;
-
-                lock (locker)
-                {
-                    try
-                    {
-                        appSettings = (ApplicationSettings)Cache.Get("AppSettings");
-                    }
-                    catch (KeyNotFoundException)
-                    {
-                        // Load and cache the settings.
-                        appSettings = Configuration.LoadAppSettings();
-                        Cache.Add("AppSettings", appSettings);
-                    }
-                }
+                ApplicationSettings appSettings = (ApplicationSettings)Cache.Get(Const.CACHE_KEY_APPLICATION_SETTINGS);
 
                 return appSettings;
             }
         }
 
+        public static XmlNode WorkerSetting
+        {
+            get { return (XmlNode)Cache.Get(Const.CACHE_KEY_WORKER_SETTINGS); }
+        }
+
+        public static FtpWatcherConfiguration FtpWatcherSetting
+        {
+            get { return (FtpWatcherConfiguration) Cache.Get(Const.CACHE_KEY_FTPWATCHER_SETTINGS); }
+        }
+
+        public static Dictionary<string, Dictionary<string, string>> GeneralSetting
+        {
+            get { return (Dictionary<string, Dictionary<string, string>>) Cache.Get(Const.CACHE_KEY_GENERAL_SETTINGS); }
+        }
+
+        /// <summary>
+        /// Get config from component propery config key is "application_setting"
+        /// </summary>
+        /// <param name="componentInitContext"></param>
+        /// <returns></returns>
+        public static ApplicationSettings GetApplicationSettings(IComponentInitContext componentInitContext)
+        {
+            ApplicationSettings applicationSettings;
+
+            lock (locker)
+            {
+                try
+                {
+                    applicationSettings = (ApplicationSettings)Cache.Get(Const.CACHE_KEY_APPLICATION_SETTINGS);
+                }
+                catch (KeyNotFoundException)
+                {
+                    if (componentInitContext == null | string.IsNullOrEmpty(componentInitContext.Config[Const.PROP_APPLICATION_SETTING]))
+                    {
+                        throw new KeyNotFoundException(
+                            string.Format(
+                                "The config key {0} was not found in component property.", Const.PROP_APPLICATION_SETTING));
+                    }
+                    applicationSettings = LoadApplicationSettings(componentInitContext.Config[Const.PROP_APPLICATION_SETTING]);
+                    Cache.Add(Const.CACHE_KEY_APPLICATION_SETTINGS, applicationSettings);
+                }
+            }
+            return applicationSettings;
+        }
+
         /// <summary>
         /// Gets a general configuration value.
+        /// default load local config xml for WOD FTP property
         /// </summary>
         /// <param name="groupName">The group name under which the config item resides.</param>
         /// <param name="keyName">The name of the config item.</param>
@@ -73,49 +123,29 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 try
                 {
-                    generalConfiguration =
-                        (Dictionary<string, Dictionary<string, string>>)Cache.Get("GeneralConfiguration");
+                    generalConfiguration = (Dictionary<string, Dictionary<string, string>>)Cache.Get(Const.CACHE_KEY_GENERAL_SETTINGS);
                 }
                 catch (KeyNotFoundException)
                 {
                     // Load and cache the configuration.
-                    generalConfiguration = LoadGeneralConfiguration();
-                    Cache.Add("GeneralConfiguration", generalConfiguration);
+                    generalConfiguration = GeneralSetting;
+                    Cache.Add(Const.CACHE_KEY_GENERAL_SETTINGS, generalConfiguration);
                 }
             }
 
             // Get the group's configuration.
-            Dictionary<string, string> groupConfig;
-            try
+            Dictionary<string, string> groupConfig = generalConfiguration[groupName];
+
+            if (groupConfig != null)
             {
-                groupConfig = generalConfiguration[groupName];
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new KeyNotFoundException(
-                    string.Format("The config group name {0} was not found in general configuration for app {1}.",
-                        groupName, AppSettings.ApplicationName));
+                return groupConfig[keyName];
             }
 
-            // Get the value of the key.
-            string value;
-            try
-            {
-                value = groupConfig[keyName];
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new KeyNotFoundException(
-                    string.Format(
-                        "The config key {0} was not found in general configuration under group {1} for app {2}.",
-                        keyName, groupName, AppSettings.ApplicationName));
-            }
-
-            return value;
+            return string.Empty;
         }
 
         /// <summary>
-        /// Gets a worker's configuration.
+        /// Get config from component propery config key is "worker_setting"
         /// </summary>
         /// <returns></returns>
         public static XmlNode GetWorkerConfiguration(IComponentInitContext componentInitContext)
@@ -126,7 +156,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 try
                 {
-                    workerSettingXmlNode = (XmlNode) Cache.Get("WorkerConfiguration");
+                    workerSettingXmlNode = (XmlNode)Cache.Get(Const.CACHE_KEY_WORKER_SETTINGS);
                 }
                 catch (KeyNotFoundException)
                 {
@@ -134,11 +164,11 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     {
                         throw new KeyNotFoundException(
                             string.Format(
-                                "The config key {0} was not found in component property."));
+                                "The config key {0} was not found in component property.", Const.PROP_WORKER_SETTING));
                     }
                     // Load and cache the configuration.
                     workerSettingXmlNode = LoadWorkerConfiguration(componentInitContext.Config[Const.PROP_WORKER_SETTING]);
-                    Cache.Add("WorkerConfiguration", workerSettingXmlNode);
+                    Cache.Add(Const.CACHE_KEY_WORKER_SETTINGS, workerSettingXmlNode);
                 }
             }
             return workerSettingXmlNode;
@@ -146,33 +176,71 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         public static FtpWatcherConfiguration GetFtpWatcherConfiguration(IComponentInitContext componentInitContext)
         {
-            FtpWatcherConfiguration watcher = new FtpWatcherConfiguration();
+            FtpWatcherConfiguration watcher;
 
-            var workerSetting = GetWorkerConfiguration(componentInitContext);
+            lock (ftpwatcherLocker)
+            {
+                try
+                {
+                    watcher = (FtpWatcherConfiguration)Cache.Get(Const.CACHE_KEY_FTPWATCHER_SETTINGS);
+                }
+                catch (KeyNotFoundException)
+                {
+                    var workerSetting = GetWorkerConfiguration(componentInitContext);
 
-            watcher.Name = XmlUtilities.SafeSelect(workerSetting, "MessageName").InnerText;
-            watcher.DeleteAfterDownloading = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(workerSetting, "DeleteAfterDownloading").InnerText);
-            watcher.PollingFileExtensions = ValidationUtilities.Split(XmlUtilities.SafeSelect(workerSetting, "FileExtensionList").InnerText, 1, true, ",");
-            watcher.PollingEndpoint = new FtpEndpoint();
-            watcher.PollingEndpoint.Name = watcher.Name;
-            watcher.PollingEndpoint.Address = XmlUtilities.SafeSelect(workerSetting, "ftpUrl").InnerText;
-            watcher.PollingEndpoint.Username = XmlUtilities.SafeSelect(workerSetting, "UserName").InnerText;
-            watcher.PollingEndpoint.Password = XmlUtilities.SafeSelect(workerSetting, "Pass").InnerText;
-            watcher.PollingEndpoint.TransferInterval = new TimeSpan(0, 0, 0, 0, ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(workerSetting, "TransferIntervalMs").InnerText));
-            watcher.PollingEndpoint.InTransitFileExtension = XmlUtilities.SafeSelect(workerSetting, "TransitFileExtension").InnerText;
+                    watcher = new FtpWatcherConfiguration();
+                    watcher.Name = XmlUtilities.SafeSelect(workerSetting, "MessageName").InnerText;
+                    watcher.DeleteAfterDownloading = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(workerSetting, "DeleteAfterDownloading").InnerText);
+                    watcher.PollingFileExtensions = ValidationUtilities.Split(XmlUtilities.SafeSelect(workerSetting, "FileExtensionList").InnerText, 1, true, ",");
+                    watcher.PollingEndpoint = new FtpEndpoint();
+                    watcher.PollingEndpoint.Name = watcher.Name;
+                    watcher.PollingEndpoint.Address = XmlUtilities.SafeSelect(workerSetting, "ftpUrl").InnerText;
+                    watcher.PollingEndpoint.Username = XmlUtilities.SafeSelect(workerSetting, "UserName").InnerText;
+                    watcher.PollingEndpoint.Password = XmlUtilities.SafeSelect(workerSetting, "Pass").InnerText;
+                    watcher.PollingEndpoint.TransferInterval = new TimeSpan(0, 0, 0, 0, ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(workerSetting, "TransferIntervalMs").InnerText));
+                    watcher.PollingEndpoint.InTransitFileExtension = XmlUtilities.SafeSelect(workerSetting, "TransitFileExtension").InnerText;
 
-            // Storage values.
-            watcher.StorageFilePath = XmlUtilities.SafeSelect(workerSetting, "StoragePath").InnerText;
+                    // Storage values.
+                    watcher.StorageFilePath = XmlUtilities.SafeSelect(workerSetting, "StoragePath").InnerText;
 
-            // Forwarding values.
-            //watcher.ForwardingEndpoint = CreateEndpoint(ValidationUtilities.ParseInt(reader, "ENDPOINT_TYPE_ID"));
-            //watcher.ForwardingEndpoint.InitFromDataReader(reader);
-            //string dsn = ValidationUtilities.ParseString(reader, "CONTEXT_DSN");
-            //string conditionName = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_NAME");
-            //string conditionValue = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_VALUE");
-            //watcher.ForwardingMailMessage = new IntegrationMailMessage(0, conditionName, conditionValue, 0, dsn, string.Empty, null, string.Empty);
-
+                    // Forwarding values.
+                    //watcher.ForwardingEndpoint = CreateEndpoint(ValidationUtilities.ParseInt(reader, "ENDPOINT_TYPE_ID"));
+                    //watcher.ForwardingEndpoint.InitFromDataReader(reader);
+                    //string dsn = ValidationUtilities.ParseString(reader, "CONTEXT_DSN");
+                    //string conditionName = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_NAME");
+                    //string conditionValue = ValidationUtilities.ParseString(reader, "CONTEXT_CONDITION_VALUE");
+                    //watcher.ForwardingMailMessage = new IntegrationMailMessage(0, conditionName, conditionValue, 0, dsn, string.Empty, null, string.Empty);
+                    Cache.Add(Const.CACHE_KEY_FTPWATCHER_SETTINGS, watcher);
+                }
+            }
             return watcher;
+        }
+
+        public static Dictionary<string, Dictionary<string, string>> GetGeneralConfiguration(IComponentInitContext componentInitContext)
+        {
+            Dictionary<string, Dictionary<string, string>> generalDictionary;
+
+            lock (generalConfigLocker)
+            {
+                try
+                {
+                    generalDictionary =
+                        (Dictionary<string, Dictionary<string, string>>) Cache.Get(Const.CACHE_KEY_GENERAL_SETTINGS);
+                }
+                catch (KeyNotFoundException)
+                {
+                    if (componentInitContext == null | string.IsNullOrEmpty(componentInitContext.Config[Const.PROP_GENERAL_SETTING]))
+                    {
+                        throw new KeyNotFoundException(
+                            string.Format(
+                                "The config key {0} was not found in component property.", Const.PROP_GENERAL_SETTING));
+                    }
+                    // Load and cache the configuration.
+                    generalDictionary = LoadGeneralConfiguration(componentInitContext.Config[Const.PROP_GENERAL_SETTING]);
+                    Cache.Add(Const.CACHE_KEY_GENERAL_SETTINGS, generalDictionary);
+                }
+            }
+            return generalDictionary;
         }
 
         /// <summary>
@@ -192,6 +260,10 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 Cache.Remove("WorkerConfiguration");
             }
+            lock (ftpwatcherLocker)
+            {
+                Cache.Remove("FtpWatcherSetting");
+            }
         }
 
         #endregion
@@ -204,21 +276,52 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             return workerSettings;
         }
 
-        private static Dictionary<string, Dictionary<string, string>> LoadGeneralConfiguration()
+        private static ApplicationSettings LoadApplicationSettings(string configuration)
+        {
+            ApplicationSettings appSettings = new ApplicationSettings();
+
+            #region Application setting configuration
+
+            var applicationXmlNode = XmlUtilities.StringToXmlNode(configuration); //GetFileResource(@"\L_01\application_setting.xml")
+            appSettings.ApplicationID = ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(applicationXmlNode, "IC_ID").InnerText);
+            //appSettings.ApplicationName = appName;
+            appSettings.AsmUsername = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_USERNAME").InnerText;
+            appSettings.AsmPassword = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_PASSWORD").InnerText;
+            appSettings.IntegrationDataDsn = XmlUtilities.SafeSelect(applicationXmlNode, "CI_CENTRAL_DSN").InnerText;
+            appSettings.IsCertAuthEnabled = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(applicationXmlNode, "IS_CERT_AUTH_ENABLED").InnerText);
+            appSettings.ConditionValidatorTypename = XmlUtilities.SafeSelect(applicationXmlNode, "CONDITION_VALIDATOR_TYPENAME").InnerText;
+            appSettings.CoreServiceLocator = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_SERVICE_LOCATOR").InnerText;
+            appSettings.TempFolderPath = "";
+            //FileUtilities.ResolveSpecialFolderPath(
+            //    ValidationUtilities.ParseString(reader, "TEMP_SPECIAL_FOLDER", true),
+            //    ValidationUtilities.ParseString(reader, "TEMP_FOLDER_PATH"));
+            appSettings.CommunicationLogServiceCache = XmlUtilities.SafeSelect(applicationXmlNode, "COMM_LOG_SERVICE_CACHE").InnerText;
+            //appSettings.RequiredCI_CENTRALSchemaVersion = requiredCI_CENTRALSchemaVersion;
+            //appSettings.RequiredCI_BUSINESSDATASchemaVersion = requiredCI_BUSINESSDATASchemaVersion;
+            //appSettings.CoreVersionCompatibilityFileName = coreVersionCompatibilityFileName;
+            //appSettings.DisableVersionCheck = ValidationUtilities.ParseBool(disableVersionCheck);
+
+            return appSettings;
+
+            #endregion
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> LoadGeneralConfiguration(string configuration)
         {
             Dictionary<string, Dictionary<string, string>> generalConfiguration =
                 new Dictionary<string, Dictionary<string, string>>();
 
-            var generalXmlNode = XmlUtilities.StringToXmlNode(GetFileResource(@"\L_01\general_configuration_setting.xml"));
+            var generalXmlNode = XmlUtilities.StringToXmlNode(configuration);
 
             // Get the configuration details.
             string groupName = XmlUtilities.SafeSelectText(generalXmlNode, "//group/@name");
 
             var groupSettings = XmlUtilities.SafeSelectList(generalXmlNode, "//group//setting");
-            
+
 
             // Get the group config dictionary.
             Dictionary<string, string> groupConfiguration;
+
             try
             {
                 groupConfiguration = generalConfiguration[groupName];
@@ -236,12 +339,14 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                         string configValue = ((XmlNode)item).Attributes["value"].Value.ToString(); //XmlUtilities.SafeSelectText((XmlNode)item, "//setting/@value");
 
                         // Add the new key to the group.
-                        if (groupConfiguration.ContainsKey(keyName))
-                            throw new IntegrationException(
+                        if (!groupConfiguration.ContainsKey(keyName))
+                            groupConfiguration.Add(keyName, configValue);
+                        /*
+                        throw new IntegrationException(
                                 string.Format(
                                     "The config key {0} exists more than once under group {1} in the general configuration of app {2}.",
                                     keyName, groupName, AppSettings.ApplicationName));
-                        groupConfiguration.Add(keyName, configValue);
+                       */
                     }
                 }
             }
@@ -249,68 +354,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             return generalConfiguration;
         }
 
-        private static ApplicationSettings LoadAppSettings()
-        {
-            ApplicationSettings appSettings = new ApplicationSettings();
-
-            #region App web configuration
-
-            string appName = ConfigurationManager.AppSettings["ApplicationName"];
-            if (string.IsNullOrEmpty(appName))
-                throw new IntegrationException("Configuration key \"ApplicationName\" not found under appSettings.");
-
-            string requiredCI_CENTRALSchemaVersion = ConfigurationManager.AppSettings["RequiredCI_CENTRALSchemaVersion"];
-            if (string.IsNullOrEmpty(requiredCI_CENTRALSchemaVersion))
-                throw new IntegrationException("Configuration key \"RequiredCI_CENTRALSchemaVersion\" not found under appSettings.");
-
-            string requiredCI_BUSINESSDATASchemaVersion = ConfigurationManager.AppSettings["RequiredCI_BUSINESSDATASchemaVersion"];
-            if (string.IsNullOrEmpty(requiredCI_BUSINESSDATASchemaVersion))
-                throw new IntegrationException("Configuration key \"RequiredCI_BUSINESSDATASchemaVersion\" not found under appSettings.");
-
-            string coreVersionCompatibilityFileName = ConfigurationManager.AppSettings["CoreVersionCompatibilityFileName"];
-            if (string.IsNullOrEmpty(coreVersionCompatibilityFileName))
-                throw new IntegrationException("Configuration key \"CoreVersionCompatibilityFileName\" not found under appSettings.");
-
-            // This is a "hidden" configuration value, by default present only in the windowsapp config, not in the service config
-            string disableVersionCheck = ConfigurationManager.AppSettings["DisableVersionCheck"];
-            if (string.IsNullOrEmpty(disableVersionCheck))
-                disableVersionCheck = "false";
-
-            #endregion
-
-            #region Application setting configuration
-
-            var applicationXmlNode = XmlUtilities.StringToXmlNode(GetFileResource(@"\L_01\application_setting.xml"));
-            appSettings.ApplicationID = ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(applicationXmlNode, "IC_ID").InnerText);
-            appSettings.ApplicationName = appName;
-            appSettings.AsmUsername = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_USERNAME").InnerText;
-            appSettings.AsmPassword = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_PASSWORD").InnerText;
-            appSettings.IntegrationDataDsn = XmlUtilities.SafeSelect(applicationXmlNode, "CI_CENTRAL_DSN").InnerText;
-            appSettings.IsCertAuthEnabled = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(applicationXmlNode, "IS_CERT_AUTH_ENABLED").InnerText);
-            appSettings.ConditionValidatorTypename = XmlUtilities.SafeSelect(applicationXmlNode, "CONDITION_VALIDATOR_TYPENAME").InnerText;
-            appSettings.CoreServiceLocator = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_SERVICE_LOCATOR").InnerText;
-            appSettings.TempFolderPath = "";
-            //FileUtilities.ResolveSpecialFolderPath(
-            //    ValidationUtilities.ParseString(reader, "TEMP_SPECIAL_FOLDER", true),
-            //    ValidationUtilities.ParseString(reader, "TEMP_FOLDER_PATH"));
-            appSettings.CommunicationLogServiceCache = XmlUtilities.SafeSelect(applicationXmlNode, "COMM_LOG_SERVICE_CACHE").InnerText;
-            appSettings.RequiredCI_CENTRALSchemaVersion = requiredCI_CENTRALSchemaVersion;
-            appSettings.RequiredCI_BUSINESSDATASchemaVersion = requiredCI_BUSINESSDATASchemaVersion;
-            appSettings.CoreVersionCompatibilityFileName = coreVersionCompatibilityFileName;
-            appSettings.DisableVersionCheck = ValidationUtilities.ParseBool(disableVersionCheck);
-
-            #endregion
-
-            return appSettings;
-
-        }
-
         private static string GetFileResource(string filePath)
         {
             try
             {
                 var fileDirectoryPrefix = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Configuration)).Location);
-                
+
                 var result = File.ReadAllText(string.Format(@"{0}..\{1}", fileDirectoryPrefix, filePath));
                 return result;
             }

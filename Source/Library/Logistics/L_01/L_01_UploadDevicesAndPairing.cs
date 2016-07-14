@@ -92,9 +92,9 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         #region Ctor
 
-        public L_01_UploadDevicesAndPairing(IComponentInitContext componentInitContext) : base(componentInitContext)
+        public L_01_UploadDevicesAndPairing()
         {
-            this.WorkerSettings = Configuration.GetWorkerConfiguration(componentInitContext);
+            this.WorkerSettings = Configuration.WorkerSetting;
         }
 
         #endregion
