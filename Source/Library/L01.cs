@@ -17,8 +17,6 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         public L01(IComponentInitContext componentInitContext)
         {
-            Thread.Sleep(20000);
-
             //first load application setting and workersetting from component property
             Configuration.Init(componentInitContext);
 
