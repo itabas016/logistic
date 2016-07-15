@@ -54,11 +54,11 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         [NonSerialized]
         [XmlIgnore]
-        Dictionary<LocationIDModelName, string> DeviceLocIdModels;
+        Dictionary<string, string> DeviceLocIdModels;
 
         [NonSerialized]
         [XmlIgnore]
-        Dictionary<LocationIDModelName, string> SmartCardLocIdModels;
+        Dictionary<string, string> SmartCardLocIdModels;
 
         [NonSerialized]
         [XmlIgnore]
@@ -213,7 +213,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     }
                 }
 
-                CreateDeviceImportLogRecord(InputFilePath, archivePath);
+                //CreateDeviceImportLogRecord(InputFilePath, archivePath);
             }
             catch (Exception validationException)
             {
@@ -257,7 +257,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     // rename the original file to fail
                     FtpRenameFile(ftpFileName, ".success");
                 }
-                UpdateDeviceImportLogRecord(succeededRecords, failedRecords);
+                //UpdateDeviceImportLogRecord(succeededRecords, failedRecords);
             }
             catch (Exception processException)
             {
@@ -342,9 +342,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
             if (DeviceLocIdModels != null)
             {
-                foreach (KeyValuePair<LocationIDModelName, string> kvp in DeviceLocIdModels)
+                foreach (KeyValuePair<string, string> kvp in DeviceLocIdModels)
                 {
-                    ProcessNewDevices(kvp.Key.ModelName, kvp.Key.LocationID, kvp.Key.DeviceStatusCode, kvp.Value);
+                    var model = Serialize(kvp.Key);
+                    if (model != null)
+                    {
+                        ProcessNewDevices(model.ModelName, model.LocationID, model.DeviceStatusCode, kvp.Value);
+                    }
                 }
             }
 
@@ -362,9 +366,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
             if (SmartCardLocIdModels != null)
             {
-                foreach (KeyValuePair<LocationIDModelName, string> kvp in SmartCardLocIdModels)
+                foreach (KeyValuePair<string, string> kvp in SmartCardLocIdModels)
                 {
-                    ProcessNewDevices(kvp.Key.ModelName, kvp.Key.LocationID, kvp.Key.DeviceStatusCode, kvp.Value);
+                    var model = Serialize(kvp.Key);
+                    if (model != null)
+                    {
+                        ProcessNewDevices(model.ModelName, model.LocationID, model.DeviceStatusCode, kvp.Value);
+                    }
                 }
             }
 
@@ -1053,9 +1061,9 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             NewSmartCards = new List<DeviceImportRecord>();
             UpdateSmartCards = new List<DeviceImportRecord>();
             PairedDevices = new List<DeviceImportRecord>();
-            DeviceLocIdModels = new Dictionary<LocationIDModelName, string>();
+            DeviceLocIdModels = new Dictionary<string, string>();
             CustomFieldsToUpdate = new Dictionary<DeviceImportRecord, CustomFieldValueCollection>();
-            SmartCardLocIdModels = new Dictionary<LocationIDModelName, string>();
+            SmartCardLocIdModels = new Dictionary<string, string>();
         }
 
         private void GetConfigValues(XmlNode workerSettings)
@@ -1096,7 +1104,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             locationIdModelName.DeviceStatusCode = deviceRecord.DeviceStatusCode;
 
             record = deviceRecord.SerialNumber + " " + deviceRecord.ChipsetID;
-            DeviceLocIdModels.TryGetValue(locationIdModelName, out filePath);
+            DeviceLocIdModels.TryGetValue(locationIdModelName.ToString(), out filePath);
 
             WriteToFile(filePath, record);
         }
@@ -1112,7 +1120,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             locationIdModelName.DeviceStatusCode = deviceRecord.DeviceStatusCode;
 
             record = deviceRecord.SmartCardSerialToPair;
-            SmartCardLocIdModels.TryGetValue(locationIdModelName, out filePath);
+            SmartCardLocIdModels.TryGetValue(locationIdModelName.ToString(), out filePath);
 
             WriteToFile(filePath, record);
         }
@@ -1247,14 +1255,14 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
             lock (DeviceLocIdModels)
             {
-                DeviceLocIdModels.TryGetValue(locationIdModelName, out tempString);
+                DeviceLocIdModels.TryGetValue(locationIdModelName.ToString(), out tempString);
                 if (tempString == null)
                 {
                     string fileName = Path.Combine(buildListImportPath,
                         "BuildList_" + locationIdModelName.LocationID + "_" +
                         locationIdModelName.ModelName + "." + Guid.NewGuid().ToString() + ".txt");
 
-                    DeviceLocIdModels.Add(locationIdModelName, fileName);
+                    DeviceLocIdModels.Add(locationIdModelName.ToString(), fileName);
                 }
             }
         }
@@ -1265,14 +1273,14 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
             lock (SmartCardLocIdModels)
             {
-                SmartCardLocIdModels.TryGetValue(locationIdModelName, out tempString);
+                SmartCardLocIdModels.TryGetValue(locationIdModelName.ToString(), out tempString);
                 if (tempString == null)
                 {
                     string fileName = Path.Combine(buildListImportPath,
                         "BuildList_" + locationIdModelName.LocationID + "_" +
                         locationIdModelName.ModelName + "." + Guid.NewGuid().ToString() + ".txt");
 
-                    SmartCardLocIdModels.Add(locationIdModelName, fileName);
+                    SmartCardLocIdModels.Add(locationIdModelName.ToString(), fileName);
                 }
             }
         }
@@ -1344,6 +1352,23 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 if (updateCustomFieldParams != null)
                     updateCustomFieldParams.doneProcessing.Set();
             }
+        }
+
+        private LocationIDModelName Serialize(string toString)
+        {
+            try
+            {
+                var array = toString.Split('|').ToList();
+                var model = new LocationIDModelName();
+                model.LocationID = array[0];
+                model.ModelName = array[1];
+                model.DeviceStatusCode = array[2];
+                return model;
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
 
         private void ReportError(DeviceImportRecord deviceRecord, string message)
