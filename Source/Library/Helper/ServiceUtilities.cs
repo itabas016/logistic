@@ -79,23 +79,11 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
         {
             T service = default(T);
 
-            if (Configuration.AppSettings.IsCertAuthEnabled)
-            {
-                // Get the credentials.
-                // Note: Certificate authentication is being used so the proof must be null.
-                string username = Configuration.AppSettings.AsmUsername;
-                string proof = Configuration.AppSettings.AsmPassword;
-                string dsn = Configuration.AppSettings.IntegrationDataDsn;
+            string username = Configuration.AppSettings.AsmUsername;
+            string proof = Configuration.AppSettings.AsmPassword;
+            string dsn = Configuration.AppSettings.IntegrationDataDsn;
 
-                service = ServiceUtilities.GetService<T>(username, proof, dsn);
-            }
-            else
-            {
-                // Get the service using the context's DSN and the application's authentication.
-                // NOTE: If certs are not being used then a password is required, which can
-                //       only come from the application's authentication
-                service = GetService<T>(Configuration.AppSettings.IntegrationDataDsn);
-            }
+            service = ServiceUtilities.GetService<T>(username, proof, dsn);
 
             // Return the service.
             return service;

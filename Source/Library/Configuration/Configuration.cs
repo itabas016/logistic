@@ -283,15 +283,15 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             #region Application setting configuration
 
             var applicationXmlNode = XmlUtilities.StringToXmlNode(configuration); //GetFileResource(@"\L_01\application_setting.xml")
-            appSettings.ApplicationID = ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(applicationXmlNode, "IC_ID").InnerText);
+            //appSettings.ApplicationID = ValidationUtilities.ParseInt(XmlUtilities.SafeSelect(applicationXmlNode, "IC_ID").InnerText);
             //appSettings.ApplicationName = appName;
             appSettings.AsmUsername = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_USERNAME").InnerText;
             appSettings.AsmPassword = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_PASSWORD").InnerText;
-            appSettings.IntegrationDataDsn = XmlUtilities.SafeSelect(applicationXmlNode, "CI_CENTRAL_DSN").InnerText;
-            appSettings.IsCertAuthEnabled = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(applicationXmlNode, "IS_CERT_AUTH_ENABLED").InnerText);
-            appSettings.ConditionValidatorTypename = XmlUtilities.SafeSelect(applicationXmlNode, "CONDITION_VALIDATOR_TYPENAME").InnerText;
+            appSettings.IntegrationDataDsn = XmlUtilities.SafeSelect(applicationXmlNode, "DSN").InnerText;
+            //appSettings.IsCertAuthEnabled = ValidationUtilities.ParseBool(XmlUtilities.SafeSelect(applicationXmlNode, "IS_CERT_AUTH_ENABLED").InnerText);
+            //appSettings.ConditionValidatorTypename = XmlUtilities.SafeSelect(applicationXmlNode, "CONDITION_VALIDATOR_TYPENAME").InnerText;
             appSettings.CoreServiceLocator = XmlUtilities.SafeSelect(applicationXmlNode, "ASM_SERVICE_LOCATOR").InnerText;
-            appSettings.TempFolderPath = "";
+            //appSettings.TempFolderPath = "";
             //FileUtilities.ResolveSpecialFolderPath(
             //    ValidationUtilities.ParseString(reader, "TEMP_SPECIAL_FOLDER", true),
             //    ValidationUtilities.ParseString(reader, "TEMP_FOLDER_PATH"));

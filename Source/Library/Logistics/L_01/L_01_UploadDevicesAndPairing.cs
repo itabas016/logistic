@@ -25,6 +25,8 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
     {
         #region Properties
 
+        string commandName;
+
         Dictionary<string, DeviceImportRecord> serialNumbers;
 
         List<DeviceImportRecord> DevicesList;
@@ -545,13 +547,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 logMessage.AppendFormat("Successed count: {0}\r\n", successRecords);
                 logMessage.AppendFormat("Failed count: {0}", failRecords);
 
-                var log = new Log() { Host = Environment.MachineName, AdditionalInformation = logMessage.ToString() };
+                var log = new Log() { Host = Environment.MachineName, MessageTrackingId = commandName, AdditionalInformation = logMessage.ToString() };
 
                 WriteInfo(log);
             }
             catch (Exception ex)
             {
-                WriteError(new Log() { Host = Environment.MachineName, AdditionalInformation = string.Format("{0}\r\n{1}", errorRecord, ex.Message) });
+                WriteError(new Log() { Host = Environment.MachineName, MessageTrackingId = commandName, AdditionalInformation = string.Format("{0}\r\n{1}", errorRecord, ex.Message) });
                 throw new Exception(errorRecord);
             }
         }
@@ -1084,6 +1086,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             ftpUrl = XmlUtilities.SafeSelect(workerSettings, "ftpUrl").InnerText;
             userName = XmlUtilities.SafeSelect(workerSettings, "UserName").InnerText;
             pass = XmlUtilities.SafeSelect(workerSettings, "Pass").InnerText;
+            commandName = XmlUtilities.SafeSelect(workerSettings, "MessageName").InnerText;
 
             // 2010.04.08 JCopus - an optional configuration field that I don't really intend to tell the client about.
             maxNumberOfProcessingThreads = Convert.ToInt32(XmlUtilities.SafeSelectText(workerSettings, "maxNumberOfProcessingThreads", "5"));

@@ -43,8 +43,8 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
         {
             var applicationSettings = Configuration.AppSettings;
 
-            Assert.AreEqual(1, applicationSettings.ApplicationID);
-            Assert.AreEqual(false, applicationSettings.IsCertAuthEnabled);
+            Assert.AreEqual(@"shalab\entriqeng", applicationSettings.AsmUsername);
+            Assert.AreEqual("entriqeng", applicationSettings.AsmPassword);
             Assert.AreEqual("http://localhost/asm/all/servicelocation.svc", applicationSettings.CoreServiceLocator);
         }
 
