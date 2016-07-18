@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -17,40 +18,29 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
     {
         #region Public Properties
 
-        [NonSerialized]
-        [XmlIgnore]
+        public IComponentInitContext context;
+
         public XmlNode WorkerSettings;
 
-        [NonSerialized]
-        [XmlIgnore]
         public string errorRecord;
 
-        [NonSerialized]
-        [XmlIgnore]
         public string errorFileName;
 
-        [NonSerialized]
-        [XmlIgnore]
         public string buildListImportPath;
 
-        [NonSerialized]
-        [XmlIgnore]
         public string ftpUrl;
 
-        [NonSerialized]
-        [XmlIgnore]
         public string userName;
 
-        [NonSerialized]
-        [XmlIgnore]
         public string pass;
 
         #endregion
 
         #region Ctor
 
-        public Logistic()
+        public Logistic(IComponentInitContext componentInitContext)
         {
+            context = componentInitContext;
         }
 
         #endregion

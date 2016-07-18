@@ -109,7 +109,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             StockHandlers.TryGetValue(locationID, out stockHandlerID);
             if (stockHandlerID == 0)
             {
-                Diagnostics.TraceInformation(string.Format("EC_8 LocationID {0} is not a valid StockHandler in IBS", locationID));
+                Diagnostics.Info(string.Format("EC_8 LocationID {0} is not a valid StockHandler in IBS", locationID));
             }
             return stockHandlerID;
         }
@@ -121,7 +121,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             EventReasons.TryGetValue(key, out reasonID);
             if (reasonID == 0)
             {
-                Diagnostics.TraceInformation(string.Format("EC_7 Reason {0} not defined in IBS", description));
+                Diagnostics.Info(string.Format("EC_7 Reason {0} not defined in IBS", description));
             }
 
             return reasonID;
@@ -133,7 +133,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             HardwareModels.TryGetValue(modelName, out hardwareModelID);
             if (hardwareModelID == 0)
             {
-                Diagnostics.TraceInformation(string.Format("Hardware model {0} not found", modelName));
+                Diagnostics.Info(string.Format("Hardware model {0} not found", modelName));
             }
             return hardwareModelID;
         }
@@ -190,12 +190,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     i++;
                 } while (stockHandlersCollection.More == true);  //Checking current page before going on to next.
 
-                Diagnostics.TraceInformation(logMessage);
+                Diagnostics.Info(logMessage);
             }
             catch (Exception ex)
             {
                 Interlocked.Exchange(ref this.errorLoadingCache, 1);
-                Diagnostics.TraceError(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
+                Diagnostics.Error(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
             }
         }
 
@@ -224,12 +224,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     }
                 }
 
-                Diagnostics.TraceInformation(logMessage);
+                Diagnostics.Info(logMessage);
             }
             catch (Exception ex)
             {
                 Interlocked.Exchange(ref this.errorLoadingCache, 1);
-                Diagnostics.TraceError(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
+                Diagnostics.Error(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
             }
         }
 
@@ -246,12 +246,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     UpdateDeviceReasons.Add(Convert.ToInt32(lookup.Key), lookup.Description);
                     logMessage += lookup.Key + "---" + lookup.Description + "\r\n";
                 }
-                Diagnostics.TraceInformation(logMessage);
+                Diagnostics.Info(logMessage);
             }
             catch (Exception ex)
             {
                 Interlocked.Exchange(ref this.errorLoadingCache, 1);
-                Diagnostics.TraceError(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
+                Diagnostics.Error(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
             }
         }
 
@@ -266,12 +266,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     EventReasons.Add(((int)lookupList).ToString() + "-" + lookup.Description, Convert.ToInt32(lookup.Key));
                     logMessage += ((int)lookupList).ToString() + "-" + lookup.Description + "---" + lookup.Key + "\r\n";
                 }
-                Diagnostics.TraceInformation(logMessage);
+                Diagnostics.Info(logMessage);
             }
             catch (Exception ex)
             {
                 Interlocked.Exchange(ref this.errorLoadingCache, 1);
-                Diagnostics.TraceError(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
+                Diagnostics.Error(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
             }
         }
 
@@ -291,7 +291,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             catch (Exception ex)
             {
                 Interlocked.Exchange(ref this.errorLoadingCache, 1);
-                Diagnostics.TraceError(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
+                Diagnostics.Error(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
             }
         }
 
@@ -317,12 +317,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     }
                     i++;
                 } while (models.More == true);  //Checking current page before going on to next.
-                Diagnostics.TraceInformation(logMessage);
+                Diagnostics.Info(logMessage);
             }
             catch (Exception ex)
             {
                 Interlocked.Exchange(ref this.errorLoadingCache, 1);
-                Diagnostics.TraceError(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
+                Diagnostics.Error(string.Format("Error occured while loading cache in {0}.\r\n{1}", MethodBase.GetCurrentMethod().Name, ex.ToString()));
             }
         }
 

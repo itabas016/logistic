@@ -289,7 +289,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             }
             catch (Exception ex)
             {
-                Diagnostics.TraceWarning(string.Format("Warning: exception thrown in FtpRename (useSFTP=true) with sourceFilename='{0}', newName={1}:\r\n{2}\r\nStack trace:\r\n{3}", sourceFilename, newName, ex.Message, ex.StackTrace));
+                Diagnostics.Warning(string.Format("Warning: exception thrown in FtpRename (useSFTP=true) with sourceFilename='{0}', newName={1}:\r\n{2}\r\nStack trace:\r\n{3}", sourceFilename, newName, ex.Message, ex.StackTrace));
                 return false;
             }
         }

@@ -888,7 +888,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             }
             catch (Exception ex)
             {
-                Diagnostics.TraceWarning(string.Format("Warning: exception thrown in FtpRename with sourceFilename='{0}', newName={1}:\r\n{2}\r\nStack trace:\r\n{3}", sourceFilename, newName, ex.Message, ex.StackTrace));
+                Diagnostics.Warning(string.Format("Warning: exception thrown in FtpRename with sourceFilename='{0}', newName={1}:\r\n{2}\r\nStack trace:\r\n{3}", sourceFilename, newName, ex.Message, ex.StackTrace));
                 return false;
             }
             finally
@@ -958,7 +958,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             }
             catch (Exception ex)
             {
-                Diagnostics.TraceWarning(string.Format("Warning: exception thrown in FtpRenameBetter with sourceFilename='{0}', newName={1}:\r\n{2}\r\nStack trace:\r\n{3}", sourceFilename, newName, ex.Message, ex.StackTrace));
+                Diagnostics.Warning(string.Format("Warning: exception thrown in FtpRenameBetter with sourceFilename='{0}', newName={1}:\r\n{2}\r\nStack trace:\r\n{3}", sourceFilename, newName, ex.Message, ex.StackTrace));
                 return false;
             }
             finally
@@ -1294,7 +1294,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             }
             catch (Exception ex)
             {
-                Diagnostics.TraceError("Error occurred during AttemptWODftpConnect: {0}", ex.Message);
+                Diagnostics.Error("Error occurred during AttemptWODftpConnect: {0}", ex.Message);
             }
 
             if (ftp.State != States.Connected)
@@ -1304,7 +1304,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                         "Error occured while trying to connect to FTP server: '{0}', with User: '{1}, Password: '{2}'",
                         ftp.Hostname, ftp.Login, ftp.Password);
                 if (m_ftpReplyText.Length > 0) error += "\r\n" + m_ftpReplyText;
-                Diagnostics.TraceError(error);
+                Diagnostics.Error(error);
             }
 
             return ftp;

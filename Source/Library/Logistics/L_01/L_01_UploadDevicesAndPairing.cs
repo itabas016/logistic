@@ -24,60 +24,32 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
     {
         #region Properties
 
-        [NonSerialized]
-        [XmlIgnore]
         Dictionary<string, DeviceImportRecord> serialNumbers;
 
-        [NonSerialized]
-        [XmlIgnore]
         List<DeviceImportRecord> DevicesList;
 
-        [NonSerialized]
-        [XmlIgnore]
         List<DeviceImportRecord> NewDevices;
 
-        [NonSerialized]
-        [XmlIgnore]
         List<DeviceImportRecord> NewSmartCards;
 
-        [NonSerialized]
-        [XmlIgnore]
         List<DeviceImportRecord> UpdateDevices;
 
-        [NonSerialized]
-        [XmlIgnore]
         List<DeviceImportRecord> UpdateSmartCards;
 
-        [NonSerialized]
-        [XmlIgnore]
         List<DeviceImportRecord> PairedDevices;
 
-        [NonSerialized]
-        [XmlIgnore]
         Dictionary<string, string> DeviceLocIdModels;
 
-        [NonSerialized]
-        [XmlIgnore]
         Dictionary<string, string> SmartCardLocIdModels;
 
-        [NonSerialized]
-        [XmlIgnore]
         Dictionary<DeviceImportRecord, CustomFieldValueCollection> CustomFieldsToUpdate;
 
-        [NonSerialized]
-        [XmlIgnore]
         DeviceImportLogRecord logRecord;
 
-        [NonSerialized]
-        [XmlIgnore]
         string deviceTypePaired;
 
-        [NonSerialized]
-        [XmlIgnore]
         string externalStockHandlerID;
 
-        [NonSerialized]
-        [XmlIgnore]
         L_01_Utils l_01_utils;
 
         int maxNumberOfProcessingThreads = 5;
@@ -92,7 +64,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         #region Ctor
 
-        public L_01_UploadDevicesAndPairing()
+        public L_01_UploadDevicesAndPairing(IComponentInitContext componentInitContex) : base(componentInitContex)
         {
             this.WorkerSettings = Configuration.WorkerSetting;
         }
@@ -442,6 +414,8 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             UpdateCustomFields();
         }
 
+        //IF Log entry table instead of CI_CN_import record table
+
         protected void CreateDeviceImportLogRecord(string inputFilePath, string archivePath)
         {
             InitializeLogRecord();
@@ -779,7 +753,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     "buildList.StockReceiveDetailsId={2}  \r\n" +
                     "buildList.TransactionType={3}  \r\n", buildList.ModelId, buildList.Reason, buildList.StockReceiveDetailsId, buildList.TransactionType);
 
-                Diagnostics.TraceInformation(message.ToString());
+                Diagnostics.Info(message.ToString());
 
                 // TJohnson - 10/26/2009 - IBSO 15738 - switching over to asynch core calls
                 DeviceFileUploadRequest deviceFileUploadRequest = new DeviceFileUploadRequest();
@@ -828,9 +802,9 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     Interlocked.Increment(ref failedRecords);
                 }
                 if (errorDuringProcessing)
-                    Diagnostics.TraceError(message.ToString());
+                    Diagnostics.Error(message.ToString());
                 else
-                    Diagnostics.TraceInformation(message.ToString());
+                    Diagnostics.Info(message.ToString());
 
                 #endregion
             }
@@ -839,7 +813,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 errorRecord = "EC_16d An unexpected error occurred while trying to processing BuildList file '" + filePath + "' " + ex.ToString();
                 WriteToFile(errorFileName, errorRecord);
                 Interlocked.Increment(ref failedRecords);
-                Diagnostics.TraceError(message + Environment.NewLine + errorRecord);
+                Diagnostics.Error(message + Environment.NewLine + errorRecord);
             }
         }
 
@@ -898,7 +872,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 WriteToFile(errorFileName, errorRecord);
                 Interlocked.Increment(ref failedRecords);
 
-                Diagnostics.TraceError("Update Devices  \r\n" + errorRecord);
+                Diagnostics.Error("Update Devices  \r\n" + errorRecord);
             }
         }
 
@@ -909,13 +883,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 if (obj == null)
                 {
-                    Diagnostics.TraceError(string.Format("ERROR: {0}() was passed a NULL parameter.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name));
+                    Diagnostics.Error(string.Format("ERROR: {0}() was passed a NULL parameter.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name));
                     return;
                 }
 
                 if ((obj is DeviceImportRecordThreadParam) == false)
                 {
-                    Diagnostics.TraceError(string.Format("ERROR: {0}() was passed a parameter of type '{1}', but was expecting type '{2}'.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name, obj.GetType().Name, typeof(DeviceImportRecordThreadParam).Name));
+                    Diagnostics.Error(string.Format("ERROR: {0}() was passed a parameter of type '{1}', but was expecting type '{2}'.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name, obj.GetType().Name, typeof(DeviceImportRecordThreadParam).Name));
                     return;
                 }
 
@@ -973,7 +947,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             catch (Exception ex)
             {
                 if (deviceImportRecordThreadParam == null)
-                    Diagnostics.TraceError("Unexpected error occured: " + ex.ToString());
+                    Diagnostics.Error("Unexpected error occured: " + ex.ToString());
                 else
                     ReportError(deviceImportRecordThreadParam.deviceImportRecord, "EC_16e An unexpected error occurred. " + ex.ToString());
             }
@@ -1031,7 +1005,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                         if (unknownStatusReported == false)
                         {
                             string warning = string.Format("Warning: Unknown ScheduleStatus of '{0}' returned from ScheduleManagerService.GetScheduleHeader(). The IC will continue to wait for a known ScheduleStatus until ", Enum.GetName(typeof(ScheduleStatus), header.Status));
-                            Diagnostics.TraceWarning(warning);
+                            Diagnostics.Warning(warning);
                             unknownStatusReported = true;
                         }
                         Thread.CurrentThread.Join(pollInterval);
@@ -1132,13 +1106,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 if (parms == null)
                 {
-                    Diagnostics.TraceError(string.Format("ERROR: {0}() was passed a NULL parameter.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name));
+                    Diagnostics.Error(string.Format("ERROR: {0}() was passed a NULL parameter.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name));
                     return;
                 }
 
                 if ((parms is DeviceImportRecordThreadParam) == false)
                 {
-                    Diagnostics.TraceError(string.Format("ERROR: {0}() was passed a parameter of type '{1}', but was expecting type '{2}'.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name, parms.GetType().Name, typeof(DeviceImportRecordThreadParam).Name));
+                    Diagnostics.Error(string.Format("ERROR: {0}() was passed a parameter of type '{1}', but was expecting type '{2}'.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name, parms.GetType().Name, typeof(DeviceImportRecordThreadParam).Name));
                     return;
                 }
 
@@ -1234,12 +1208,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 }
                 catch (Exception ex)
                 {
-                    Diagnostics.TraceError(ex.ToString() + string.Format("\r\ndeviceImportRecord.recordNumber: '{0}', deviceImportRecord.SerialNumber: '{1}'\r\n", deviceImportRecord.recordNumber, deviceImportRecord.SerialNumber));
+                    Diagnostics.Error(ex.ToString() + string.Format("\r\ndeviceImportRecord.recordNumber: '{0}', deviceImportRecord.SerialNumber: '{1}'\r\n", deviceImportRecord.recordNumber, deviceImportRecord.SerialNumber));
                 }
             }
             catch (Exception ex)
             {
-                Diagnostics.TraceError("Unexpected error occured: " + ex.ToString());
+                Diagnostics.Error("Unexpected error occured: " + ex.ToString());
             }
             finally
             {
@@ -1292,13 +1266,13 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 if (obj == null)
                 {
-                    Diagnostics.TraceError(string.Format("ERROR: {0}() was passed a NULL parameter.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name));
+                    Diagnostics.Error(string.Format("ERROR: {0}() was passed a NULL parameter.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name));
                     return;
                 }
 
                 if ((obj is UpdateCustomFieldParams) == false)
                 {
-                    Diagnostics.TraceError(string.Format("ERROR: {0}() was passed a parameter of type '{1}', but was expecting type '{2}'.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name, obj.GetType().Name, typeof(UpdateCustomFieldParams).Name));
+                    Diagnostics.Error(string.Format("ERROR: {0}() was passed a parameter of type '{1}', but was expecting type '{2}'.  Please report this error to Irdeto BSS Integration team.\r\n", MethodBase.GetCurrentMethod().Name, obj.GetType().Name, typeof(UpdateCustomFieldParams).Name));
                     return;
                 }
 
@@ -1331,7 +1305,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             {
                 if (updateCustomFieldParams == null)
                 {
-                    Diagnostics.TraceError("Unexpected error occured: " + ex.ToString());
+                    Diagnostics.Error("Unexpected error occured: " + ex.ToString());
                 }
                 else
                 {
@@ -1343,7 +1317,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     WriteToFile(errorFileName, errorRecord);
                     Interlocked.Increment(ref failedRecords);
 
-                    Diagnostics.TraceError("Update Device Custom Fields  \r\n" + errorRecord);
+                    Diagnostics.Error("Update Device Custom Fields  \r\n" + errorRecord);
                 }
             }
             finally
@@ -1377,7 +1351,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             errorRecord += "---" + message;
             WriteToFile(errorFileName, errorRecord);
             Interlocked.Increment(ref this.failedRecords);
-            Diagnostics.TraceError(errorRecord);
+            Diagnostics.Error(errorRecord);
         }
 
         private string BuildErrorRecord(DeviceImportRecord deviceRecord)

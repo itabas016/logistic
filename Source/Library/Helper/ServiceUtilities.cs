@@ -187,12 +187,12 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                                 if (cacheSettings[0] > 5000)
                                 {
                                     string warning = string.Format("Warning the maximum value for the CommunicationLogServiceCache '<max cached entries>' setting is 5000.  The value configure was '{0}'.\r\nThe default settings of {1} '<max cached entries>' and {2} '<cache timeout in seconds>' will be used.", cacheSettings[0], maxEnteries, secondsToCache);
-                                    Diagnostics.TraceWarning(warning);
+                                    Diagnostics.Warning(warning);
                                 }
                                 else if (cacheSettings[1] > 600)
                                 {
                                     string warning = string.Format("Warning the maximum value for the CommunicationLogServiceCache '<cache timeout in seconds>' setting is 600 (ten minutes).  The value configure was '{0}'.\r\nThe default settings of {1} '<max cached entries>' and {2} '<cache timeout in seconds>' will be used.", cacheSettings[1], maxEnteries, secondsToCache);
-                                    Diagnostics.TraceWarning(warning);
+                                    Diagnostics.Warning(warning);
                                 }
                                 else
                                 {
@@ -205,7 +205,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     catch (Exception ex)
                     {
                         string warning = string.Format("Warning: There was a problem reading the CommunicationLogServiceCache setting from the application configuration file.\r\nThe default settings of {0} '<max cached entries>' and {1} '<cache timeout in seconds>' will be used.\r\nThe error encountered was: \r\n{2}", maxEnteries, secondsToCache, ex.ToString());
-                        Diagnostics.TraceWarning(warning);
+                        Diagnostics.Warning(warning);
                     }
 
                     var realCommlogService = AsmRepository.GetServiceProxy<ICommunicationLogService>(authentication);
@@ -221,7 +221,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     catch (Exception ex)
                     {
                         //Logging.IcLogger.WriteError(string.Format("An error occurred while attempting to set up the Communication Log Service.  Please report this error to Irdeto.\r\n{0}", ex));
-                        Diagnostics.TraceError(string.Format("An error occurred while attempting to set up the Communication Log Service.  Please report this error to Irdeto.\r\n{0}", ex));
+                        Diagnostics.Error(string.Format("An error occurred while attempting to set up the Communication Log Service.  Please report this error to Irdeto.\r\n{0}", ex));
                     }
 
                     CommunicationLogServiceHandle = AsmRepository.GetServiceProxy<ICommunicationLogService>(authentication);

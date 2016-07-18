@@ -317,17 +317,17 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
         private void LogError(string message)
         {
-            Diagnostics.TraceError(string.Format("Error from FtpWatcher {0}.\r\n\r\n{1}\r\n\r\n{2}", configuration.PollingEndpoint.Name, message, configuration.PollingEndpoint.ToString()));
+            Diagnostics.Error(string.Format("Error from FtpWatcher {0}.\r\n\r\n{1}\r\n\r\n{2}", configuration.PollingEndpoint.Name, message, configuration.PollingEndpoint.ToString()));
         }
 
         private void LogWarning(string message)
         {
-            Diagnostics.TraceWarning(string.Format("Warning from FtpWatcher {0}.\r\n\r\n{1}\r\n\r\n{2}", configuration.PollingEndpoint.Name, message, configuration.PollingEndpoint.ToString()));
+            Diagnostics.Warning(string.Format("Warning from FtpWatcher {0}.\r\n\r\n{1}\r\n\r\n{2}", configuration.PollingEndpoint.Name, message, configuration.PollingEndpoint.ToString()));
         }
 
         private void LogInfo(string message)
         {
-            Diagnostics.TraceInformation(string.Format("Info from FtpWatcher {0}.\r\n\r\n{1}\r\n\r\n{2}", configuration.PollingEndpoint.Name, message, configuration.PollingEndpoint.ToString()));
+            Diagnostics.Info(string.Format("Info from FtpWatcher {0}.\r\n\r\n{1}\r\n\r\n{2}", configuration.PollingEndpoint.Name, message, configuration.PollingEndpoint.ToString()));
         }
 
         #endregion

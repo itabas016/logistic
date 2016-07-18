@@ -83,5 +83,17 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics.Tests.Common
             return result;
         }
         #endregion
+
+        #region File watcher
+
+
+
+        #endregion
+
+        #region File process
+
+
+
+        #endregion
     }
 }
