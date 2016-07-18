@@ -14,6 +14,7 @@ using PayMedia.ApplicationServices.Devices.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts.DataContracts;
 using PayMedia.ApplicationServices.SharedContracts;
+using PayMedia.Integration.FrameworkService.Common;
 using PayMedia.Integration.FrameworkService.Interfaces.Common;
 using LookupLists = PayMedia.ApplicationServices.Devices.ServiceContracts.LookupLists;
 
@@ -184,8 +185,6 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                         throw new Exception(errorRecord);
                     }
                 }
-
-                //CreateDeviceImportLogRecord(InputFilePath, archivePath);
             }
             catch (Exception validationException)
             {
@@ -229,7 +228,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                     // rename the original file to fail
                     FtpRenameFile(ftpFileName, ".success");
                 }
-                //UpdateDeviceImportLogRecord(succeededRecords, failedRecords);
+                LogDeviceImportRecord(InputFilePath, archivePath, succeededRecords, failedRecords);
             }
             catch (Exception processException)
             {
@@ -414,8 +413,6 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             UpdateCustomFields();
         }
 
-        //IF Log entry table instead of CI_CN_import record table
-
         protected void CreateDeviceImportLogRecord(string inputFilePath, string archivePath)
         {
             InitializeLogRecord();
@@ -517,6 +514,44 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 {
                     errorRecord = string.Format("EC_16 An unexpected error occurred in UpdateDeviceImportLogRecord. Error: {0}", ex.Message);
                 }
+                throw new Exception(errorRecord);
+            }
+        }
+
+        //IF Log entry table instead of CI_CN_import record table
+        protected void LogDeviceImportRecord(string inputFilePath, string archivePath, int successRecords, int failRecords)
+        {
+            InitializeLogRecord();
+            string originalFileName = Path.GetFileName(inputFilePath);
+            try
+            {
+                char[] delimiterChars = { '.' };
+                string[] fileName = inputFilePath.Split(delimiterChars);
+                logRecord.RunID = Convert.ToInt32(fileName[2].ToString());
+                logRecord.ID = 0;
+                logRecord.SourceURI = ftpUrl + "/" + originalFileName;
+                logRecord.ArchivePath = archivePath;
+                if (fileName.Length > 4)
+                {
+                    int.TryParse(fileName[3].ToString(), out logRecord.FixedRunID);
+                }
+
+                var logMessage = new StringBuilder();
+
+                logMessage.AppendFormat("Device import record {0}\r\n: ", DateTime.Now.ToString("M/d/yyyy HH:mm:ss"));
+                logMessage.AppendFormat("Run number: {0}\r\n", logRecord.RunID);
+                logMessage.AppendFormat("Source URL: {0}\r\n", logRecord.SourceURI);
+                logMessage.AppendFormat("Archive URL: {0}\r\n", logRecord.ArchivePath);
+                logMessage.AppendFormat("Successed count: {0}\r\n", successRecords);
+                logMessage.AppendFormat("Failed count: {0}", failRecords);
+
+                var log = new Log() { Host = Environment.MachineName, AdditionalInformation = logMessage.ToString() };
+
+                WriteInfo(log);
+            }
+            catch (Exception ex)
+            {
+                WriteError(new Log() { Host = Environment.MachineName, AdditionalInformation = string.Format("{0}\r\n{1}", errorRecord, ex.Message) });
                 throw new Exception(errorRecord);
             }
         }
@@ -1285,7 +1320,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
                 // note: I could extend our core wrapper to take a dsn, but I'm being lazy today to I will simply set the context on this thread.
                 //using (new MessageContext(this.BaseMailMessage))
                 //{
-                    
+
                 //}
                 Device device = DeviceUtilities.GetDeviceBySerialNumber(serialNumber);
                 if (device != null)

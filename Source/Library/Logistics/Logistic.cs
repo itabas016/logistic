@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using PayMedia.ApplicationServices.Devices.ServiceContracts;
 using PayMedia.ApplicationServices.ScheduleManager.ServiceContracts;
+using PayMedia.Integration.CommunicationLog.ServiceContracts;
 using PayMedia.Integration.FrameworkService.Interfaces.Common;
 
 namespace PayMedia.Integration.IFComponents.BBCL.Logistics
@@ -184,6 +185,26 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
             }
 
             return newInputFilePath;
+        }
+
+        protected void WriteInfo(ILog log)
+        {
+            if (context == null || log == null)
+            {
+                return;
+            }
+
+            //write log to IF LOG_ENTRY
+            context.Services.Logger.Info(log);
+        }
+
+        protected void WriteError(ILog log)
+        {
+            if (context == null || log == null)
+                return;
+
+            log.MessageQualifier = (int)CommunicationLogEntryMessageQualifier.Error;
+            context.Services.Logger.Error(log);
         }
 
         #endregion
