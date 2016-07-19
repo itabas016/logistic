@@ -11,7 +11,7 @@
   <ftpUrl>ftp://192.168.193.179/SAP/Logistics/L_01/</ftpUrl>
   <UserName>anonymous</UserName>
   <Pass>anonymous</Pass>
-  <DeleteAfterDownloading>true</DeleteAfterDownloading>
+  <DeleteAfterDownloading>false</DeleteAfterDownloading>
   <FileExtensionList>*.new,*.NEW</FileExtensionList>
   <TransferIntervalMs>1000</TransferIntervalMs>
   <TransitFileExtension>process</TransitFileExtension>

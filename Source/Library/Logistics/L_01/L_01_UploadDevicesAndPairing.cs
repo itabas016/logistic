@@ -540,7 +540,7 @@ namespace PayMedia.Integration.IFComponents.BBCL.Logistics
 
                 var logMessage = new StringBuilder();
 
-                logMessage.AppendFormat("Device import record {0}\r\n: ", DateTime.Now.ToString("M/d/yyyy HH:mm:ss"));
+                logMessage.AppendFormat("Device import record {0}:\r\n", DateTime.Now.ToString("M/d/yyyy HH:mm:ss"));
                 logMessage.AppendFormat("Run number: {0}\r\n", logRecord.RunID);
                 logMessage.AppendFormat("Source URL: {0}\r\n", logRecord.SourceURI);
                 logMessage.AppendFormat("Archive URL: {0}\r\n", logRecord.ArchivePath);
