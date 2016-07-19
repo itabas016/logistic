@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<SnConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!--<ConfuserHome>The Confuser installation folder</ConfuserHome>
+  <BinDir>The folder includes files to obfusacte</BinDir>
+  <SearchOverride>The target folder to find the file and repaced it</SearchOverride>
+  <Target>The folder to store output assembly</Target>
+  <SnkPath>strong key path</SnkPath>-->
+  <OneByOne>true</OneByOne>
+  <Rules>
+    <Rule Key="IgnoreMicrosoft" StartWidth="Microsoft." IsExclude="true"/>
+    <Rule Key="IgnoreAuthenticationInterceptor" StartWidth="PayMedia.Security.AuthenticationInterceptor" IsExclude="true"/>
+     
+    <Rule Key="IncludePayMediaProcess" StartWidth="PayMedia.Integration.IFComponents." Contains="BBCL" EndWith="Logistics.dll" IsExclude="false"/>
+  </Rules>
+</SnConfig>

@@ -31,42 +31,42 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Entriq.DataAccess">
-      <HintPath>..\..\Reference\Entriq.DataAccess.DLL</HintPath>
+      <HintPath>..\..\Lib\Entriq.DataAccess.DLL</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.ClientProxy, Version=62.24.0.0, Culture=neutral, PublicKeyToken=c8d07e2301cbe008, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.ClientProxy.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.ClientProxy.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.CustomFields.ServiceContracts">
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.CustomFields.ServiceContracts.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.CustomFields.ServiceContracts.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.Devices.ServiceContracts">
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.Devices.ServiceContracts.DLL</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.Devices.ServiceContracts.DLL</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.Logistics.ServiceContracts">
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.Logistics.ServiceContracts.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.Logistics.ServiceContracts.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.ProductCatalog.ServiceContracts">
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.ProductCatalog.ServiceContracts.DLL</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.ProductCatalog.ServiceContracts.DLL</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.ScheduleManager.ServiceContracts">
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.ScheduleManager.ServiceContracts.DLL</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.ScheduleManager.ServiceContracts.DLL</HintPath>
     </Reference>
     <Reference Include="PayMedia.ApplicationServices.SharedContracts">
-      <HintPath>..\..\Reference\PayMedia.ApplicationServices.SharedContracts.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.ApplicationServices.SharedContracts.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.Integration.CommunicationLog.ServiceContracts, Version=62.24.0.0, Culture=neutral, PublicKeyToken=c8d07e2301cbe008, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Reference\PayMedia.Integration.CommunicationLog.ServiceContracts.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.Integration.CommunicationLog.ServiceContracts.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.Integration.FrameworkService.Common">
-      <HintPath>..\..\Reference\PayMedia.Integration.FrameworkService.Common.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.Integration.FrameworkService.Common.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.Integration.FrameworkService.Interfaces">
-      <HintPath>..\..\Reference\PayMedia.Integration.FrameworkService.Interfaces.dll</HintPath>
+      <HintPath>..\..\Lib\PayMedia.Integration.FrameworkService.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="PayMedia.Logging">
-      <HintPath>..\..\Reference\PayMedia.Logging.DLL</HintPath>
+      <HintPath>..\..\Lib\PayMedia.Logging.DLL</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -79,11 +79,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="WeOnlyDo.Client.FTP, Version=1.7.1.203, Culture=neutral, PublicKeyToken=e066bfc6dc58a05b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Reference\WeOnlyDo.Client.FTP.dll</HintPath>
+      <HintPath>..\..\Lib\WeOnlyDo.Client.FTP.dll</HintPath>
     </Reference>
     <Reference Include="WeOnlyDo.Security.Cryptography.KeyManager, Version=2.0.4.21, Culture=neutral, PublicKeyToken=900ddd6a51580424, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Reference\WeOnlyDo.Security.Cryptography.KeyManager.dll</HintPath>
+      <HintPath>..\..\Lib\WeOnlyDo.Security.Cryptography.KeyManager.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

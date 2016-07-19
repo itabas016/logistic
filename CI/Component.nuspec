@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>L01</id>
+    <version>$version$</version>
+    <authors>Hansen</authors>
+    <owners>Hansen</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>L01 For BBCL.</description>
+    <copyright>Copyright Hansen 2016</copyright>
+    <tags>
+    </tags>
+    <!-- Minimum ICC version -->
+    <releaseNotes>62.31.0.0</releaseNotes>
+  </metadata>
+  <files>    
+    <file src="InstallationMetaData.xml" />
+
+    <!-- IFC -->
+    <file src="..\Output\PayMedia.Integration.IFComponents.BBCL.Logistics.dll" target="lib\net46\ifcomponents" />
+	
+	<!-- FTP Helper -->
+    <file src="..\Output\WeOnlyDo.Client.FTP.dll" target="lib\net46\ifcomponents" />
+	<file src="..\Output\WeOnlyDo.Security.Cryptography.KeyManager.dll" target="lib\net46\ifcomponents" />
+	
+    <!-- DB Scripts-->
+    <file src="..\Database\SQL\**" target="content\script" />
+    
+    <!-- Help-->
+    <file src="..\Help\**" target="content\help" />
+  </files>
+</package>

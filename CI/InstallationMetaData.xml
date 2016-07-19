@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<root>
+  <!--ISM-->
+  <mapping type="Lib" target="ism\IFComponents\BBCL\rs" source="lib\net46\ifcomponents"/>
+  <mapping type="Lib" target="AdminTools\Configuration\IFComponents\BBCL\rs" source="lib\net46\ifcomponents"/>
+  <mapping type="Script" target="" source="content\script"/>
+  <!--Help-->
+  <mapping type="Content" target="IBS Help\Components\rs" source="content\help"/>
+</root>

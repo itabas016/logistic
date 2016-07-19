@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- ***********************************************
+     Logistic.L01
+     *************************************************-->
+<Project ToolsVersion="4.0" DefaultTargets="Release"  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\SetEnvVar.dll" TaskName ="SetEnvVar"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\SetEnvVar.dll" TaskName ="SetEnvVar_IfDoesNotExist"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\CSProjectParser.dll" TaskName ="FindCSProjReferenceTask"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\PersistLog4NetProperty.dll" TaskName ="UpdateLog4NetLoggerLevel"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\HighestVersion.dll" TaskName ="HighestVersion"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\CopyFiles.dll" TaskName ="CopyFiles"/>
+	<UsingTask TaskName="Mail" AssemblyFile="$(FixedToolsPath)\MSBuildTasks\MSBuild.Community.Tasks.dll"/>
+	<UsingTask TaskName="Version" AssemblyFile="$(FixedToolsPath)\MSBuildTasks\MSBuild.Community.Tasks.dll"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\MSBUILDAssemblyInfoParser.dll" TaskName ="UpdateAssemblyInfo"/>
+	<UsingTask AssemblyFile ="$(FixedToolsPath)\MSBuildTasks\MSBUILDReplaceTextInFile.dll" TaskName="ReplaceTextInFileWithRegularExpression"/>
+
+	<PropertyGroup>
+		<ReleaseVersion>1.0.0.0</ReleaseVersion>
+		<AssemblyVersion>62.24.0.0</AssemblyVersion>
+		<ArtifactsPath>..\Artifacts</ArtifactsPath>
+		
+		<ReleaseFolder>LogisticL01_$(ReleaseVersion)</ReleaseFolder>
+		<ReleasePath>..\Artifacts\$(ReleaseFolder)</ReleasePath>
+		 
+		<FixedToolsPath>$(MSBuildProjectDirectory)..\..\..\..\..\..\Tools</FixedToolsPath>
+		<QAReleasePath>D:\components\rs</QAReleasePath>
+		<VersionConfigFile>$(MSBuildProjectDirectory)\version.txt</VersionConfigFile>
+		<TeamFoundationVersionControlTool>&quot;$(VS140COMNTOOLS)..\IDE\tf.exe&quot;</TeamFoundationVersionControlTool>
+	</PropertyGroup>
+
+	<Target Name="Build">
+		<MSBuild Projects="..\Source\Logistic.sln" />
+	</Target>
+	
+	<Target Name="CreateReleaseFolder">
+		<RemoveDir Directories="$(ArtifactsPath)"/>
+		<MakeDir Directories="$(ReleasePath)" />
+	</Target>
+
+	<Target Name="BuildDocs" DependsOnTargets="Build">
+		<Message Text="Ignoring BuildDocs for now." />
+	</Target>
+
+	<Target Name="CopyFileContracts">
+		<ItemGroup>
+			<FileContracts Include="$(MSBuildProjectDirectory)\..\Docs\FileContracts\*.*"/>
+		</ItemGroup>
+		<Copy SourceFiles="@(FileContracts)" DestinationFolder="$(ReleasePath)\FileContracts" />
+	</Target>
+
+	<Target Name="CopyDatabaseScripts">
+		<!--<ItemGroup>
+      <BDScripts Include="..\Database\SQL\**\BD\**" />
+      <SDScripts Include="..\Database\SQL\**\SD\**" />
+      <IFScripts Include="..\Database\SQL\**\IF\**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BDScripts)" DestinationFolder="$(ReleasePath)\Database\BD" />
+    <Copy SourceFiles="@(SDScripts)" DestinationFolder="$(ReleasePath)\Database\SD" />-->
+		<Message Text="Ignoring CopyDatabaseScripts for now." />
+	</Target>
+
+	<Target Name="CopySetup">
+		<!--<ItemGroup>
+      <SetupFiles Include="..\CreatePerformanceCounters\bin\Debug\CreatePerformanceCounters.exe"/>
+    </ItemGroup>
+    <Copy SourceFiles="@(SetupFiles)" DestinationFolder="$(ReleasePath)\Setup" />-->
+		<Message Text="Ignoring CopySetup for now." />
+	</Target>
+
+	<Target Name="CopyHelp">
+		<ItemGroup>
+			<DocFiles Include="$(MSBuildProjectDirectory)\..\Help\Userguide\*.*"/>
+		</ItemGroup>
+		<Copy SourceFiles="@(DocFiles)" DestinationFolder="$(ReleasePath)" />
+	</Target>
+
+	<Target Name="CopyAll" DependsOnTargets="CopyDatabaseScripts;CopyFileContracts;CopySetup;CopyHelp">
+	</Target>
+
+	<Target Name="RemoveArtifacts">
+		<RemoveDir Directories="$(MSBuildProjectDirectory)\..\Artifacts" />
+	</Target>
+
+	<Target Name="CreatePackage">
+		<Message Text='$(FixedToolsPath)\NuGet\nuget.exe pack Component.nuspec /OutputDirectory "$(ReleasePath)" -Properties version=$(ReleaseVersion)'></Message>
+		<Exec Command='$(FixedToolsPath)\NuGet\nuget.exe pack Component.nuspec /OutputDirectory "$(ReleasePath)" -Properties version=$(ReleaseVersion)' WorkingDirectory="."/>
+	</Target>
+
+	<Target Name="Zip">
+		<Delete Files="$(ReleasePath).zip" />
+		<Message Text='$(FixedToolsPath)\7Zip\7z.exe a "$(ReleasePath).zip" "$(ReleasePath)\*"'></Message>
+		<Exec Command='$(FixedToolsPath)\7Zip\7z.exe a "$(ReleasePath).zip" "$(ReleasePath)\*"' WorkingDirectory="..\Artifacts"/>
+	</Target>
+
+	<Target Name="Confuser">
+    <Message Text='$(FixedToolsPath)\Confuser\ObfusSNTool.exe -confuser:"$(FixedToolsPath)\Confuser" -input:"$(MSBuildProjectDirectory)\..\Output" -ref:"$(MSBuildProjectDirectory)\..\Lib\ASM"  -key:"$(MSBuildProjectDirectory)\..\Lib\Paymedia.snk" -srchvrrd:"$(MSBuildProjectDirectory)\..\Output"  "$(MSBuildProjectDirectory)\SNConfuser.xml"'></Message>
+    <Exec Command='$(FixedToolsPath)\Confuser\ObfusSNTool.exe -confuser:"$(FixedToolsPath)\Confuser" -input:"$(MSBuildProjectDirectory)\..\Output" -ref:"$(MSBuildProjectDirectory)\..\Lib\ASM"  -key:"$(MSBuildProjectDirectory)\..\Lib\Paymedia.snk" -srchvrrd:"$(MSBuildProjectDirectory)\..\Output"  "$(MSBuildProjectDirectory)\SNConfuser.xml"' WorkingDirectory="$(MSBuildProjectDirectory)"/>
+	</Target>
+
+	<Target Name="UpdateVersionFiles">
+		<Message Importance="high" Text="Get version file from source control..." />		
+		<Exec  WorkingDirectory="$(MSBuildProjectDirectory)" Command="$(TeamFoundationVersionControlTool) get /force $(VersionConfigFile)"/>
+
+		<Message Importance="high" Text="Checking out version files from source control..." />
+		<Exec  WorkingDirectory="$(MSBuildProjectDirectory)" Command="$(TeamFoundationVersionControlTool) checkout $(VersionConfigFile)"/>		
+		
+		<Message Importance="high"  Text="Incrementing the assembly version..." />		
+		<Version VersionFile="$(VersionConfigFile)" BuildType="None" RevisionType="Increment">
+			<Output TaskParameter="Major" PropertyName="Major" />
+			<Output TaskParameter="Minor" PropertyName="Minor" />
+			<Output TaskParameter="Build" PropertyName="Build" />
+			<Output TaskParameter="Revision" PropertyName="Revision" />
+		</Version>
+		
+		<CreateProperty
+      Value="$(Major).$(Minor).$(Build).$(Revision)">
+			<Output TaskParameter="Value" PropertyName="ReleaseVersion" />
+		</CreateProperty>
+
+		<CreateProperty
+		Value="ResendScheduler_$(ReleaseVersion)">
+			<Output TaskParameter="Value" PropertyName="ReleaseFolder" />
+		</CreateProperty>
+
+		<CreateProperty
+      Value="$(ArtifactsPath)\$(ReleaseFolder)">
+			<Output TaskParameter="Value" PropertyName="ReleasePath" />
+		</CreateProperty>
+		
+		<Message Importance="high"  Text="Checking in version files to source control..." />
+		<Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="$(TeamFoundationVersionControlTool) checkin /override:&quot;Check-in from automated build&quot; /comment:&quot;Increment assembly version ($(ReleaseVersion)) $(NoCICheckinComment)&quot; $(VersionConfigFile)"/>
+
+		<ItemGroup>
+			<VersionFiles Include="$(MSBuildProjectDirectory)\..\Source\Library\Properties\AssemblyInfo.cs" />
+		</ItemGroup>
+		<UpdateAssemblyInfo FileVersion="$(ReleaseVersion)" AssemblyVersion="$(AssemblyVersion)" FilesToUpdate="@(VersionFiles)"/>
+	</Target> 
+
+	<Target Name="Release" DependsOnTargets="UpdateVersionFiles;Build;BuildDocs;CreateReleaseFolder;CopyAll;Confuser;CreatePackage;Zip;PublishRelease;SendMail">
+		<Message Text="Release target completed." />
+	</Target>
+	
+	<Target Name="ReleaseWithNoMail" DependsOnTargets="UpdateVersionFiles;Build;BuildDocs;CreateReleaseFolder;CopyAll;Confuser;CreatePackage;Zip;PublishRelease">
+		<Message Text="Release target completed." />
+	</Target>
+
+	<Target Name="PublishRelease">
+		<ItemGroup>
+			<QAReleaseFile Include="$(MSBuildProjectDirectory)\..\Artifacts\$(ReleaseFolder).zip"/>
+		</ItemGroup>
+		<Copy SourceFiles="@(QAReleaseFile)" DestinationFolder="$(QAReleasePath)" ContinueOnError="true" />
+	</Target>
+
+	<Target Name="SendMail">
+		<Mail SmtpServer="10.50.168.13"
+		Username="dailybn"
+		Password="Password1234"
+		To="iccperfshanghai@hsntech.com"
+		From="DailyBuildNotification@hsntech.com"
+		Subject="Logistic.L01 $(ReleaseVersion) was built successfully"
+		Body="
+  The Logistic.L01 Installer was labeled: $(ReleaseVersion)
+ " />
+	</Target>
+
+	<!-- 
+   Copy the Files from the Unzipped location to the
+   libraries file location 
+  -->
+	<Target Name="Copy_Core_Build_Files_To_Libraries_Folder" DependsOnTargets="RetrieveAZippedCoreBuild">
+		<Message Text='Removing Libraries Folder $(MSBuildProjectDirectory)\Core '/>
+		<Delete Files="$(MSBuildProjectDirectory)\..\Libraries" />
+		<CopyFiles Source="$(MSBuildProjectDirectory)\Core\UnCompresed\Products\ISM" Destination="$(MSBuildProjectDirectory)\..\Source\Lib\Asm"  Recursive="false" SearchPattern="*.dll" />
+		<CopyFiles Source="$(MSBuildProjectDirectory)\Core\UnCompresed\Products\ASM" Destination="$(MSBuildProjectDirectory)\..\Source\Lib\Asm"  Recursive="false" SearchPattern="*.pdb" />
+	</Target>
+
+	<!-- 
+    Retrieves the Enterprise installer 
+    from the Filer Server and unzips to the following folder
+    (MSBuildProjectDirectory)\Core\UnCompresed  
+  -->
+	<Target Name="RetrieveAZippedCoreBuild">
+		<Message Text='------------------ '/>
+		<Message Text='Retrieve the Enterprise Installer To Decompress' />
+		<Message Text='------------------ ' />
+
+		<Message Text='Find the Highest Version' />
+		<HighestVersion EnterpriseInstallerFolder="$(BuildShare)$(Core_ReleaseSP_Version)\Enterprise_Installer">
+			<Output TaskParameter="LargestVersion" PropertyName="HighestVersionFolder" />
+		</HighestVersion>
+
+		<PropertyGroup>
+			<HighestVersionFolder Condition="'$(Core_Release_UseHighestVersion)'=='false'">$(Core_Release_FuLLVersion)</HighestVersionFolder>
+		</PropertyGroup>
+
+		<Message Text="Core Version = $(HighestVersionFolder)" />
+		<Message Text="$(BuildShare)$(Core_ReleaseSP_Version)\Enterprise_Installer\$(HighestVersionFolder)\*.exe"/>
+
+		<Message Text='Remove Files from $(MSBuildProjectDirectory)\Core' />
+
+		<ItemGroup>
+			<fileToDelete Include="$(MSBuildProjectDirectory)\Core\**\*.*" />
+			<directoryToDelete Include="$(MSBuildProjectDirectory)\Core\**\" />
+		</ItemGroup>
+
+		<Message Text='Removing Folder $(MSBuildProjectDirectory)\Core '/>
+		<Exec  Command="rmdir /s /q $(MSBuildProjectDirectory)\Core" />
+		<CopyFiles Source="$(BuildShare)$(Core_ReleaseSP_Version)\Enterprise_Installer\$(HighestVersionFolder)\" Destination="$(MSBuildProjectDirectory)\Core"  Recursive="false" SearchPattern="*.*" />
+
+		<Message Text='------------------ '/>
+		<Exec  Command="$(MSBuildProjectDirectory)\..\Tools\7z.exe x -o$(MSBuildProjectDirectory)\Core\UnCompresed $(MSBuildProjectDirectory)\Core\ICC_$(HighestVersionFolder).exe" />
+		<Message Text='------------------ '/>
+	</Target>
+</Project>
